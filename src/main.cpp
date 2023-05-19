@@ -552,7 +552,6 @@ void cursor_position_callback(GLFWwindow* window, double x, double y)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.translate(glm::vec3(0.0f, 0.0f, (float)yoffset));
-    // camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
 
 // utility function for loading a 2D texture from file
