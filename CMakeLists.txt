@@ -40,6 +40,9 @@ endif(WIN32)
 set(SOURCES
     src/main.cpp
     ${PROJECT_SOURCE_DIR}/3rdParty/glad/src/glad.c
+    src/graphic/gl_vertex_array.cpp
+    src/utility/resource_manager.cpp
+    src/skybox.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -77,6 +80,7 @@ target_link_libraries(${PROJECT_NAME} ${LIBS})
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/include/src
         ${PROJECT_SOURCE_DIR}/3rdParty/glad/include
         ${PROJECT_SOURCE_DIR}/3rdParty/glfw/include
         ${PROJECT_SOURCE_DIR}/3rdParty/glm

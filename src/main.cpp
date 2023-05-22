@@ -5,16 +5,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "shader.hpp"
-#include "camera.hpp"
-#include "model.hpp"
-
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
 #include <string>
 #include <iostream>
+
+#include "shader.hpp"
+#include "render_camera.hpp"
+#include "model.hpp"
+#include "graphic/gl_shader_program.h"
+#include "utility/resource_manager.h"
 
 GLFWwindow* window;
 
@@ -24,7 +26,6 @@ void processInput(GLFWwindow *window);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void cursor_position_callback(GLFWwindow* window, double x, double y);
 
-unsigned int loadTexture(std::string path, bool gammaCorrection);
 void renderSphere();
 void renderQuad();
 void renderCube();
@@ -37,7 +38,7 @@ bool bloom = true;
 float exposure = 1.0f;
 
 // camera
-Camera camera;
+render_camera camera;
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -53,10 +54,6 @@ struct {
     bool right = false;
     bool middle = false;
 } mouseButtons;
-
-const std::string getAssetPath() {
-    return "./../../data/";
-}
 
 void setupImGui() {
     // Setup Dear ImGui content
@@ -136,7 +133,7 @@ int main() {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     // camera
-    camera.type = Camera::CameraType::lookat;
+    camera.type = render_camera::CameraType::lookat;
     camera.setPerspective(45.0f, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 256.0f);
     camera.rotationSpeed = 0.1f;
     camera.movementSpeed = 0.1f;
@@ -145,12 +142,12 @@ int main() {
 
     // build and compile shaders
     // -------------------------
-    Shader pbrShader(getAssetPath() + "shaders/pbr.vs", getAssetPath() + "shaders/pbr.fs");
-    Shader equirectangularToCubemapShader(getAssetPath() + "shaders/specular_IBL_cubemap.vs", getAssetPath() + "shaders/specular_IBL_equirectangular_to_cubemap.fs");
-    Shader irradianceShader(getAssetPath() + "shaders/specular_IBL_cubemap.vs", getAssetPath() + "shaders/specular_IBL_irradiance_convolution.fs");
-    Shader prefilterShader(getAssetPath() + "shaders/specular_IBL_cubemap.vs", getAssetPath() + "shaders/specular_IBL_prefilter.fs");
-    Shader brdfShader(getAssetPath() + "shaders/specular_IBL_brdf.vs", getAssetPath() + "shaders/specular_IBL_brdf.fs");
-    Shader backgroundShader(getAssetPath() + "shaders/specular_IBL_background.vs", getAssetPath() + "shaders/specular_IBL_background.fs");
+    shader pbrShader(resource_manager::getAssetPath() + "shaders/pbr.vs", resource_manager::getAssetPath() + "shaders/pbr.fs");
+    shader equirectangularToCubemapShader(resource_manager::getAssetPath() + "shaders/specular_IBL_cubemap.vs", resource_manager::getAssetPath() + "shaders/specular_IBL_equirectangular_to_cubemap.fs");
+    shader irradianceShader(resource_manager::getAssetPath() + "shaders/specular_IBL_cubemap.vs", resource_manager::getAssetPath() + "shaders/specular_IBL_irradiance_convolution.fs");
+    shader prefilterShader(resource_manager::getAssetPath() + "shaders/specular_IBL_cubemap.vs", resource_manager::getAssetPath() + "shaders/specular_IBL_prefilter.fs");
+    shader brdfShader(resource_manager::getAssetPath() + "shaders/specular_IBL_brdf.vs", resource_manager::getAssetPath() + "shaders/specular_IBL_brdf.fs");
+    shader backgroundShader(resource_manager::getAssetPath() + "shaders/specular_IBL_background.vs", resource_manager::getAssetPath() + "shaders/specular_IBL_background.fs");
 
     pbrShader.use();
     pbrShader.setInt("irradianceMap", 0);
@@ -165,7 +162,7 @@ int main() {
     backgroundShader.setInt("environmentMap", 0);
 
     // Titanium
-    Model human_model(getAssetPath() + "models/nanosuit/nanosuit.obj");
+    model human_model(resource_manager::getAssetPath() + "models/nanosuit/nanosuit.obj");
 
     // lights
     // ------
@@ -189,7 +186,7 @@ int main() {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
 
     int width, height, nrComponents;
-    float* data = stbi_loadf((getAssetPath() + "textures/hdr/LA_Downtown_Afternoon_Fishing_3k.hdr").c_str(), &width, &height, &nrComponents, 0);
+    float* data = stbi_loadf((resource_manager::getAssetPath() + "textures/hdr/LA_Downtown_Afternoon_Fishing_3k.hdr").c_str(), &width, &height, &nrComponents, 0);
     unsigned int hdrTexture;
     if (data)
     {
@@ -552,54 +549,6 @@ void cursor_position_callback(GLFWwindow* window, double x, double y)
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.translate(glm::vec3(0.0f, 0.0f, (float)yoffset));
-}
-
-// utility function for loading a 2D texture from file
-// ---------------------------------------------------
-unsigned int loadTexture(std::string path, bool gammaCorrection)
-{
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-
-    int width, height, nrComponents;
-    unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
-    if (data)
-    {
-        GLenum internalFormat;
-        GLenum dataFormat;
-        if (nrComponents == 1)
-        {
-            internalFormat = dataFormat = GL_RED;
-        }
-        else if (nrComponents == 3)
-        {
-            internalFormat = gammaCorrection ? GL_SRGB : GL_RGB;
-            dataFormat = GL_RGB;
-        }
-        else if (nrComponents == 4)
-        {
-            internalFormat = gammaCorrection ? GL_SRGB_ALPHA : GL_RGBA;
-            dataFormat = GL_RGBA;
-        }
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
-
-    return textureID;
 }
 
 // renders (and builds at first invocation) a sphere

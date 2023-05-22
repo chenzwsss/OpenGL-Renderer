@@ -9,13 +9,13 @@
 #include <sstream>
 #include <iostream>
 
-class Shader
+class shader
 {
 public:
     unsigned int ID;
     // constructor generates the shader on the fly
     // ------------------------------------------------------------------------
-    Shader(std::string vertexPath, std::string fragmentPath, std::string geometryPath = "")
+    shader(std::string vertexPath, std::string fragmentPath, std::string geometryPath = "")
     {
         // 1. retrieve the vertex/fragment source code from filePath
         std::string vertexCode;
