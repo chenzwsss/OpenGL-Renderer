@@ -229,8 +229,8 @@ int main() {
         //human_model.Draw(pbr_shader);
 
         glm::vec3 new_pos = light_position + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
-        pbr_shader.set_uniform("light_position", new_pos);
-        pbr_shader.set_uniform("light_color", light_color);
+        pbr_shader.set_uniform("lightPosition", new_pos);
+        pbr_shader.set_uniform("lightColor", light_color);
 
         // render skybox (render as last to prevent overdraw)
         skybox_shader.bind();
