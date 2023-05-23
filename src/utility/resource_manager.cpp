@@ -8,11 +8,11 @@
 
 #include <stb_image.h>
 
-unsigned int resource_manager::loadTexture(std::string path, const bool useMipMaps) const {
+unsigned int resource_manager::load_texture(std::string path, const bool useMipMaps) const {
     if (path.empty())
         return 0;
 
-    std::string new_path = getAssetPath() + path;
+    std::string new_path = get_assets_path() + path;
 
     unsigned int textureID;
     glGenTextures(1, &textureID);
@@ -56,9 +56,9 @@ unsigned int resource_manager::loadTexture(std::string path, const bool useMipMa
     return textureID;
 }
 
-unsigned int resource_manager::loadHDRI(const std::string path) const {
+unsigned int resource_manager::load_hdr_i(const std::string path) const {
 
-    std::string new_path = getAssetPath() + path;
+    std::string new_path = get_assets_path() + path;
 
     int width, height, nrComp;
     auto* data{ stbi_loadf(new_path.data(), &width, &height, &nrComp, 0) };
@@ -83,9 +83,9 @@ unsigned int resource_manager::loadHDRI(const std::string path) const {
     return hdrTexture;
 }
 
-std::string resource_manager::loadTextFile(const std::string path) const {
+std::string resource_manager::load_text_file(const std::string path) const {
 
-    std::string new_path = getAssetPath() + path;
+    std::string new_path = get_assets_path() + path;
 
     std::ifstream in(new_path, std::ios::in);
     in.exceptions(std::ifstream::failbit | std::ifstream::badbit);

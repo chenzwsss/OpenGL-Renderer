@@ -133,11 +133,11 @@ int main() {
 
     // camera
     camera.type = render_camera::CameraType::lookat;
-    camera.setPerspective(45.0f, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 256.0f);
+    camera.set_perspective(45.0f, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 256.0f);
     camera.rotationSpeed = 0.1f;
     camera.movementSpeed = 0.1f;
-    camera.setPosition({ 0.0f, 0.0f, -5.0f });
-    camera.setRotation({ 0.0f, 0.0f, 0.0f });
+    camera.set_position({ 0.0f, 0.0f, -5.0f });
+    camera.set_rotation({ 0.0f, 0.0f, 0.0f });
 
     // shaders
     gl_shader_program pbrShader{"PBR Shader", {
@@ -151,19 +151,19 @@ int main() {
     }};
 
     pbrShader.bind();
-    pbrShader.setUniformi("irradianceMap", 0);
-    pbrShader.setUniformi("prefilterMap", 1);
-    pbrShader.setUniformi("brdfLUT", 2);
-    pbrShader.setUniformi("albedoMap", 3);
-    pbrShader.setUniformi("normalMap", 4);
-    pbrShader.setUniformi("metallicMap", 5);
-    pbrShader.setUniformi("roughnessMap", 6);
+    pbrShader.set_uniform_i("irradianceMap", 0);
+    pbrShader.set_uniform_i("prefilterMap", 1);
+    pbrShader.set_uniform_i("brdfLUT", 2);
+    pbrShader.set_uniform_i("albedoMap", 3);
+    pbrShader.set_uniform_i("normalMap", 4);
+    pbrShader.set_uniform_i("metallicMap", 5);
+    pbrShader.set_uniform_i("roughnessMap", 6);
 
     skyboxShader.bind();
-    skyboxShader.setUniformi("environmentMap", 0);
+    skyboxShader.set_uniform_i("environmentMap", 0);
 
     // Titanium
-    //model human_model(resource_manager::getAssetPath() + "models/nanosuit/nanosuit.obj");
+    //model human_model(resource_manager::get_assets_path() + "models/nanosuit/nanosuit.obj");
 
     // lights
     // ------
@@ -178,9 +178,9 @@ int main() {
     // --------------------------------------------------
     glm::mat4 projection = camera.matrices.perspective;
     pbrShader.bind();
-    pbrShader.setUniform("projection", projection);
+    pbrShader.set_uniform("projection", projection);
     skyboxShader.bind();
-    skyboxShader.setUniform("projection", projection);
+    skyboxShader.set_uniform("projection", projection);
 
     // then before rendering, configure the viewport to the original framebuffer's screen dimensions
     int scrWidth, scrHeight;
@@ -211,30 +211,30 @@ int main() {
         pbrShader.bind();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.matrices.view;
-        pbrShader.setUniform("view", view);
-        pbrShader.setUniform("camPos", camera.position);
+        pbrShader.set_uniform("view", view);
+        pbrShader.set_uniform("camPos", camera.position);
 
         // bind pre-computed IBL data
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.GetIrradianceMap());
+        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_irradiance_map());
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.GetPrefilterMap());
+        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_prefilter_map());
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, env_skybox.GetBRDFLUT());
+        glBindTexture(GL_TEXTURE_2D, env_skybox.get_brdf_lut());
 
         //// model
         //model = glm::mat4(1.0f);
         //model = glm::translate(model, glm::vec3(-3.0, 0.0, 2.0));
-        //pbrShader.setUniform("model", model);
+        //pbrShader.set_uniform("model", model);
         //human_model.Draw(pbrShader);
 
         glm::vec3 newPos = lightPosition + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
-        pbrShader.setUniform("lightPosition", newPos);
-        pbrShader.setUniform("lightColor", lightColor);
+        pbrShader.set_uniform("lightPosition", newPos);
+        pbrShader.set_uniform("lightColor", lightColor);
 
         // render skybox (render as last to prevent overdraw)
         skyboxShader.bind();
-        skyboxShader.setUniform("view", view);
+        skyboxShader.set_uniform("view", view);
         env_skybox.draw();
 
         // render ImGui
@@ -270,7 +270,7 @@ void processInput(GLFWwindow *window)
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     if ((width > 0.0f) && (height > 0.0f)) {
-        camera.updateAspectRatio((float)width / (float)height);
+        camera.update_aspect_ratio((float)width / (float)height);
     }
 
     // make sure the viewport matches the new window dimensions; note that width and 

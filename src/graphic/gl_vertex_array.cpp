@@ -4,7 +4,7 @@ void gl_vertex_array::init() {
     glGenVertexArrays(1, &m_vao);
 }
 
-void gl_vertex_array::attachBuffer(const BufferType type, const size_t size, const DrawMode mode, const void* data) {
+void gl_vertex_array::attach_buffer(const BufferType type, const size_t size, const DrawMode mode, const void* data) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
 
@@ -16,7 +16,7 @@ void gl_vertex_array::bind() const {
     glBindVertexArray(m_vao);
 }
 
-void gl_vertex_array::enableAttribute(const GLuint index, const int size, const GLuint offset, const void* data) {
+void gl_vertex_array::enable_attribute(const GLuint index, const int size, const GLuint offset, const void* data) {
     glEnableVertexAttribArray(index);
     glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, offset, data);
 }

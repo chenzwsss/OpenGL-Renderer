@@ -17,21 +17,21 @@ class gl_shader_program {
         ~gl_shader_program();
 
         void bind() const;
-        void deleteProgram() const;
+        void delete_program() const;
 
-        void setUniformi(const std::string& uniformName, const int value);
-        void setUniformf(const std::string& uniformName, const float value);
-        void setUniform(const std::string& uniformName, const glm::ivec2& value);
-        void setUniform(const std::string& uniformName, const glm::vec2& value);
-        void setUniform(const std::string& uniformName, const glm::vec3& value);
-        void setUniform(const std::string& uniformName, const glm::vec4& value);
-        void setUniform(const std::string& uniformName, const glm::mat3x3& value);
-        void setUniform(const std::string& uniformName, const glm::mat4x4& value);
+        void set_uniform_i(const std::string& uniformName, const int value);
+        void set_uniform_f(const std::string& uniformName, const float value);
+        void set_uniform(const std::string& uniformName, const glm::ivec2& value);
+        void set_uniform(const std::string& uniformName, const glm::vec2& value);
+        void set_uniform(const std::string& uniformName, const glm::vec3& value);
+        void set_uniform(const std::string& uniformName, const glm::vec4& value);
+        void set_uniform(const std::string& uniformName, const glm::mat3x3& value);
+        void set_uniform(const std::string& uniformName, const glm::mat4x4& value);
 
-        auto getProgramName() const { return m_programName; }
+        auto get_program_name() const { return m_programName; }
 
     private:
-        void collectUniforms();
+        void collect_uniforms();
 
         std::unordered_map<std::string, int> m_uniforms;
 

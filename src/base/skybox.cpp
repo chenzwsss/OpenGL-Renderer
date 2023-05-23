@@ -76,7 +76,7 @@ void skybox::init(const std::string hdrPath, const GLsizei resolution) {
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, resolution, resolution);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, envMapRBO);
 
-    const auto hdrTexture = resource_manager::getInstance().loadHDRI(hdrPath);
+    const auto hdrTexture = resource_manager::get_instance().load_hdr_i(hdrPath);
 
     glGenTextures(1, &m_envCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_envCubemap);
@@ -106,8 +106,8 @@ void skybox::init(const std::string hdrPath, const GLsizei resolution) {
     } };
 
     convertToCubemapShader.bind();
-    convertToCubemapShader.setUniformi("equirectangularMap", 0);
-    convertToCubemapShader.setUniform("projection", captureProjection);
+    convertToCubemapShader.set_uniform_i("equirectangularMap", 0);
+    convertToCubemapShader.set_uniform("projection", captureProjection);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, hdrTexture);
@@ -115,17 +115,17 @@ void skybox::init(const std::string hdrPath, const GLsizei resolution) {
     glViewport(0, 0, resolution, resolution);
     glBindFramebuffer(GL_FRAMEBUFFER, m_envMapFBO);
     for (auto i = 0; i < 6; ++i) {
-        convertToCubemapShader.setUniform("view", captureViews[i]);
+        convertToCubemapShader.set_uniform("view", captureViews[i]);
 
         // Attach environment texture to FBO
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_envCubemap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        renderCube();
+        render_cube();
     }
 
     glDeleteTextures(1, &hdrTexture);
-    convertToCubemapShader.deleteProgram();
+    convertToCubemapShader.delete_program();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Generate mipmaps from first mip face (again to reduce bright dots)
@@ -156,8 +156,8 @@ void skybox::init(const std::string hdrPath, const GLsizei resolution) {
     }};
 
     irradianceShader.bind();
-    irradianceShader.setUniformi("environmentMap", 0);
-    irradianceShader.setUniform("projection", captureProjection);
+    irradianceShader.set_uniform_i("environmentMap", 0);
+    irradianceShader.set_uniform("projection", captureProjection);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_envCubemap);
@@ -165,13 +165,13 @@ void skybox::init(const std::string hdrPath, const GLsizei resolution) {
     glViewport(0, 0, resolution / 16, resolution / 16);
     glBindFramebuffer(GL_FRAMEBUFFER, m_envMapFBO);
     for (unsigned int i = 0; i < 6; ++i) {
-        irradianceShader.setUniform("view", captureViews[i]);
+        irradianceShader.set_uniform("view", captureViews[i]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_irradianceMap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        renderCube();
+        render_cube();
     }
-    irradianceShader.deleteProgram();
+    irradianceShader.delete_program();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // 3.Create a pre-filter cubemap, and re-scale capture FBO to pre-filter scale
@@ -196,8 +196,8 @@ void skybox::init(const std::string hdrPath, const GLsizei resolution) {
     }};
 
     prefilterShader.bind();
-    prefilterShader.setUniformi("environmentMap", 0);
-    prefilterShader.setUniform("projection", captureProjection);
+    prefilterShader.set_uniform_i("environmentMap", 0);
+    prefilterShader.set_uniform("projection", captureProjection);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_envCubemap);
 
@@ -212,17 +212,17 @@ void skybox::init(const std::string hdrPath, const GLsizei resolution) {
         glViewport(0, 0, mipWidth, mipHeight);
 
         const float roughness = static_cast<float>(mipLevel) / static_cast<float>((maxMipLevels - 1));
-        prefilterShader.setUniformf("roughness", roughness);
+        prefilterShader.set_uniform_f("roughness", roughness);
         // For 6 cubemap faces
         for (auto i = 0; i < 6; ++i) {
-            prefilterShader.setUniform("view", captureViews[i]);
+            prefilterShader.set_uniform("view", captureViews[i]);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, m_prefilterMap, mipLevel);
             
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            renderCube();
+            render_cube();
         }
     }
-    prefilterShader.deleteProgram();
+    prefilterShader.delete_program();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // 4.Generate 2D LUT from BRDF equations
@@ -252,17 +252,17 @@ void skybox::init(const std::string hdrPath, const GLsizei resolution) {
     m_quadVAO.bind();
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     
-    brdfShader.deleteProgram();
+    brdfShader.delete_program();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void skybox::draw() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_envCubemap);
-    renderCube();
+    render_cube();
 }
 
-void skybox::renderCube() {
+void skybox::render_cube() {
     glBindVertexArray(m_cubeVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);

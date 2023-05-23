@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(PROJECT_NAME OpenGL_Renderer)
+set(PROJECT_NAME opengl_renderer)
 
 project (${PROJECT_NAME})
 

@@ -191,7 +191,7 @@ private:
             if (!skip)
             {   // if texture hasn't been loaded already, load it
                 Texture texture;
-                texture.id = resource_manager::getInstance().loadTexture(this->directory + '/' + static_cast<std::string>(str.C_Str()));
+                texture.id = resource_manager::get_instance().load_texture(this->directory + '/' + static_cast<std::string>(str.C_Str()));
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);

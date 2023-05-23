@@ -17,9 +17,9 @@ class gl_vertex_array {
         };
 
         void init();
-        void attachBuffer(const BufferType type, const size_t size, const DrawMode mode, const void* data);
+        void attach_buffer(const BufferType type, const size_t size, const DrawMode mode, const void* data);
         void bind() const;
-        void enableAttribute(const GLuint index, const int size, const GLuint offset, const void* data);
+        void enable_attribute(const GLuint index, const int size, const GLuint offset, const void* data);
         void destroy();
 
     private:
