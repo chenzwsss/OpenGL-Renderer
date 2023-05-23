@@ -23,7 +23,7 @@ GLFWwindow* window;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void processInput(GLFWwindow *window);
+void process_input(GLFWwindow *window);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 void cursor_position_callback(GLFWwindow* window, double x, double y);
 
@@ -38,13 +38,13 @@ float exposure = 1.0f;
 
 // camera
 render_camera camera;
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
-bool firstMouse = true;
+float last_x = SCR_WIDTH / 2.0f;
+float last_y = SCR_HEIGHT / 2.0f;
+bool first_mouse = true;
 
 // timing
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
+float delta_time = 0.0f;
+float last_frame = 0.0f;
 
 std::string WINDOW_NAME = "OpenGL_Renderer";
 
@@ -52,9 +52,9 @@ struct {
     bool left = false;
     bool right = false;
     bool middle = false;
-} mouseButtons;
+} mouse_buttons;
 
-void setupImGui() {
+void setup_imgui() {
     // Setup Dear ImGui content
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -65,7 +65,7 @@ void setupImGui() {
     ImGui_ImplOpenGL3_Init("#version 330 core");
 }
 
-void renderImGui()
+void render_imgui()
 {
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
@@ -118,7 +118,7 @@ int main() {
     }
 
     // initial ImGui
-    setupImGui();
+    setup_imgui();
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
     stbi_set_flip_vertically_on_load(true);
@@ -132,43 +132,43 @@ int main() {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     // camera
-    camera.type = render_camera::CameraType::lookat;
+    camera.type = render_camera::camera_type::lookat;
     camera.set_perspective(45.0f, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 256.0f);
-    camera.rotationSpeed = 0.1f;
-    camera.movementSpeed = 0.1f;
+    camera.rotation_speed = 0.1f;
+    camera.movement_speed = 0.1f;
     camera.set_position({ 0.0f, 0.0f, -5.0f });
     camera.set_rotation({ 0.0f, 0.0f, 0.0f });
 
     // shaders
-    gl_shader_program pbrShader{"PBR Shader", {
+    gl_shader_program pbr_shader{"PBR Shader", {
         {"shaders/pbr.vs", "vertex"},
         {"shaders/pbr.fs", "fragment"}
     }};
 
-    gl_shader_program skyboxShader{"Skybox Shader", {
+    gl_shader_program skybox_shader{"Skybox Shader", {
         {"shaders/skyboxvs.glsl", "vertex"},
         {"shaders/skyboxps.glsl", "fragment"}
     }};
 
-    pbrShader.bind();
-    pbrShader.set_uniform_i("irradianceMap", 0);
-    pbrShader.set_uniform_i("prefilterMap", 1);
-    pbrShader.set_uniform_i("brdfLUT", 2);
-    pbrShader.set_uniform_i("albedoMap", 3);
-    pbrShader.set_uniform_i("normalMap", 4);
-    pbrShader.set_uniform_i("metallicMap", 5);
-    pbrShader.set_uniform_i("roughnessMap", 6);
+    pbr_shader.bind();
+    pbr_shader.set_uniform_i("irradianceMap", 0);
+    pbr_shader.set_uniform_i("prefilterMap", 1);
+    pbr_shader.set_uniform_i("brdfLUT", 2);
+    pbr_shader.set_uniform_i("albedoMap", 3);
+    pbr_shader.set_uniform_i("normalMap", 4);
+    pbr_shader.set_uniform_i("metallicMap", 5);
+    pbr_shader.set_uniform_i("roughnessMap", 6);
 
-    skyboxShader.bind();
-    skyboxShader.set_uniform_i("environmentMap", 0);
+    skybox_shader.bind();
+    skybox_shader.set_uniform_i("environmentMap", 0);
 
     // Titanium
     //model human_model(resource_manager::get_assets_path() + "models/nanosuit/nanosuit.obj");
 
     // lights
     // ------
-    glm::vec3 lightPosition = glm::vec3(-10.0f, 10.0f, 10.0f);
-    glm::vec3 lightColor = glm::vec3(300.0f, 300.0f, 300.0f);
+    glm::vec3 light_position = glm::vec3(-10.0f, 10.0f, 10.0f);
+    glm::vec3 light_color = glm::vec3(300.0f, 300.0f, 300.0f);
 
     // skybox
     skybox env_skybox;
@@ -177,15 +177,15 @@ int main() {
     // initialize static shader uniforms before rendering
     // --------------------------------------------------
     glm::mat4 projection = camera.matrices.perspective;
-    pbrShader.bind();
-    pbrShader.set_uniform("projection", projection);
-    skyboxShader.bind();
-    skyboxShader.set_uniform("projection", projection);
+    pbr_shader.bind();
+    pbr_shader.set_uniform("projection", projection);
+    skybox_shader.bind();
+    skybox_shader.set_uniform("projection", projection);
 
     // then before rendering, configure the viewport to the original framebuffer's screen dimensions
-    int scrWidth, scrHeight;
-    glfwGetFramebufferSize(window, &scrWidth, &scrHeight);
-    glViewport(0, 0, scrWidth, scrHeight);
+    int scr_width, scr_height;
+    glfwGetFramebufferSize(window, &scr_width, &scr_height);
+    glViewport(0, 0, scr_width, scr_height);
 
     // render loop
     // -----------
@@ -193,13 +193,13 @@ int main() {
     {
         // per-frame time logic
         // --------------------
-        float currentFrame = static_cast<float>(glfwGetTime());
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        float current_frame = static_cast<float>(glfwGetTime());
+        delta_time = current_frame - last_frame;
+        last_frame = current_frame;
 
         // input
         // -----
-        processInput(window);
+        process_input(window);
 
         // render
         // ------
@@ -208,11 +208,11 @@ int main() {
 
         // render scene, supplying the convoluted irradiance map to the final shader.
         // ------------------------------------------------------------------------------------------
-        pbrShader.bind();
+        pbr_shader.bind();
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.matrices.view;
-        pbrShader.set_uniform("view", view);
-        pbrShader.set_uniform("camPos", camera.position);
+        pbr_shader.set_uniform("view", view);
+        pbr_shader.set_uniform("camPos", camera.position);
 
         // bind pre-computed IBL data
         glActiveTexture(GL_TEXTURE0);
@@ -225,20 +225,20 @@ int main() {
         //// model
         //model = glm::mat4(1.0f);
         //model = glm::translate(model, glm::vec3(-3.0, 0.0, 2.0));
-        //pbrShader.set_uniform("model", model);
-        //human_model.Draw(pbrShader);
+        //pbr_shader.set_uniform("model", model);
+        //human_model.Draw(pbr_shader);
 
-        glm::vec3 newPos = lightPosition + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
-        pbrShader.set_uniform("lightPosition", newPos);
-        pbrShader.set_uniform("lightColor", lightColor);
+        glm::vec3 new_pos = light_position + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
+        pbr_shader.set_uniform("light_position", new_pos);
+        pbr_shader.set_uniform("light_color", light_color);
 
         // render skybox (render as last to prevent overdraw)
-        skyboxShader.bind();
-        skyboxShader.set_uniform("view", view);
+        skybox_shader.bind();
+        skybox_shader.set_uniform("view", view);
         env_skybox.draw();
 
         // render ImGui
-        renderImGui();
+        render_imgui();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -259,7 +259,7 @@ int main() {
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
+void process_input(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
@@ -282,19 +282,19 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS)
-            mouseButtons.left = true;
+            mouse_buttons.left = true;
         else if (action == GLFW_RELEASE)
-            mouseButtons.left = false;
+            mouse_buttons.left = false;
     } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
         if (action == GLFW_PRESS)
-            mouseButtons.right = true;
+            mouse_buttons.right = true;
         else if (action == GLFW_RELEASE)
-            mouseButtons.right = false;
+            mouse_buttons.right = false;
     } else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
         if (action == GLFW_PRESS)
-            mouseButtons.middle = true;
+            mouse_buttons.middle = true;
         else if (action == GLFW_RELEASE)
-            mouseButtons.middle = false;
+            mouse_buttons.middle = false;
     }
 }
 
@@ -305,26 +305,26 @@ void cursor_position_callback(GLFWwindow* window, double x, double y)
     float xpos = static_cast<float>(x);
     float ypos = static_cast<float>(y);
 
-    if (firstMouse)
+    if (first_mouse)
     {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
+        last_x = xpos;
+        last_y = ypos;
+        first_mouse = false;
     }
 
-    float dx = xpos - lastX;
-    float dy = ypos - lastY;
+    float dx = xpos - last_x;
+    float dy = ypos - last_y;
 
-    lastX = xpos;
-    lastY = ypos;
+    last_x = xpos;
+    last_y = ypos;
 
-    if (mouseButtons.left) {
-        camera.rotate(glm::vec3(dy * camera.rotationSpeed, dx * camera.rotationSpeed, 0.0f));
+    if (mouse_buttons.left) {
+        camera.rotate(glm::vec3(dy * camera.rotation_speed, dx * camera.rotation_speed, 0.0f));
     }
-    if (mouseButtons.right) {
+    if (mouse_buttons.right) {
         camera.translate(glm::vec3(-0.0f, 0.0f, dy * .005f));
     }
-    if (mouseButtons.middle) {
+    if (mouse_buttons.middle) {
         camera.translate(glm::vec3(dx * 0.005f, -dy * 0.005f, 0.0f));
     }
 }

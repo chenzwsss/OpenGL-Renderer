@@ -13,9 +13,9 @@ struct mesh {
 
     void clear();
 
-    auto get_triangle_count() const { return indexCount / 3; }
+    auto get_triangle_count() const { return index_count / 3; }
 
-    const std::size_t indexCount;
+    const std::size_t index_count;
     gl_vertex_array vao;
     pbr_material_ptr material;
 

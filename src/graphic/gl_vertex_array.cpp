@@ -4,7 +4,7 @@ void gl_vertex_array::init() {
     glGenVertexArrays(1, &m_vao);
 }
 
-void gl_vertex_array::attach_buffer(const BufferType type, const size_t size, const DrawMode mode, const void* data) {
+void gl_vertex_array::attach_buffer(const buffer_type type, const size_t size, const draw_mode mode, const void* data) {
     GLuint buffer;
     glGenBuffers(1, &buffer);
 

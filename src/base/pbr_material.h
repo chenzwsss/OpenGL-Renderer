@@ -11,7 +11,7 @@ class pbr_material {
     public:
         pbr_material();
 
-        enum ParameterType : int {
+        enum parameter_type : int {
             ALBEDO = 0,
             AO,
             METALLIC,
@@ -20,12 +20,12 @@ class pbr_material {
         };
 
         void init(const std::string name,
-            const std::string albedoPath,
-            const std::string aoPath,
-            const std::string metallicPath,
-            const std::string normalPath,
-            const std::string roughnessPath,
-            const std::string alphaMaskPath);
+            const std::string albedo_path,
+            const std::string ao_path,
+            const std::string metallic_path,
+            const std::string normal_path,
+            const std::string roughness_path,
+            const std::string alpha_mask_path);
 
         void init(const std::string name,
             const glm::vec3& albedo,
@@ -35,24 +35,24 @@ class pbr_material {
             const glm::vec3& roughness,
             const float alpha = 1.0f);
 
-        unsigned int get_parameter_texture(const ParameterType parameter) const;
-        glm::vec3 get_parameter_color(const ParameterType parameter) const;
+        unsigned int get_parameter_texture(const parameter_type parameter) const;
+        glm::vec3 get_parameter_color(const parameter_type parameter) const;
 
         auto get_alpha_value() const {
             return m_alpha;
         }
 
         auto get_alpha_mask() const {
-            return m_alphaMaskTexture;
+            return m_alpha_mask_texture;
         }
 
         std::string m_name;
     private:
-        std::array<unsigned int, 5> m_materialTextures;
-        std::array<glm::vec3, 5> m_materialColors;
+        std::array<unsigned int, 5> m_material_textures;
+        std::array<glm::vec3, 5> m_material_colors;
 
         float m_alpha;
-        unsigned int m_alphaMaskTexture;
+        unsigned int m_alpha_mask_texture;
 };
 
 using pbr_material_ptr = std::shared_ptr<pbr_material>;

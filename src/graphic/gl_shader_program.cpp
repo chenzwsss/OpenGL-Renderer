@@ -12,111 +12,109 @@ const std::unordered_map<std::string, int> GL_SHADER_TYPE_ENUM {
     { "compute", GL_COMPUTE_SHADER }
 };
 
-void scanForIncludes(std::string& shaderCode) {
-    std::size_t startPos = 0;
-    const static std::string includeDirective{ "#include " };
+void scan_for_includes(std::string& shader_code) {
+    std::size_t start_pos = 0;
+    const static std::string include_directive{ "#include " };
 
     // Scan string for all instances of include directive
-    while ((startPos = shaderCode.find(includeDirective, startPos)) != std::string::npos) {
+    while ((start_pos = shader_code.find(include_directive, start_pos)) != std::string::npos) {
         // Find position of include directive
-        const auto pos = startPos + includeDirective.length() + 1;
-        const auto length = shaderCode.find('"', pos);
-        const auto pathToIncludedFile = shaderCode.substr(pos, length - pos);
+        const auto pos = start_pos + include_directive.length() + 1;
+        const auto length = shader_code.find('"', pos);
+        const auto path_to_included_file = shader_code.substr(pos, length - pos);
 
         // Load included file
-        const auto includedFile = resource_manager::get_instance().load_text_file(pathToIncludedFile) + "\n";
+        const auto included_file = resource_manager::get_instance().load_text_file(path_to_included_file) + "\n";
         // Insert into shader code
-        shaderCode.replace(startPos, (length + 1) - startPos, includedFile);
+        shader_code.replace(start_pos, (length + 1) - start_pos, included_file);
         
         // Increment start position and continue scanning
-        startPos += includedFile.length();
+        start_pos += included_file.length();
     }
 }
 
-void compile(const GLuint id, const GLchar* shaderCode) {
-    glShaderSource(id, 1, &shaderCode, nullptr);
+void compile(const GLuint id, const GLchar* shader_code) {
+    glShaderSource(id, 1, &shader_code, nullptr);
     glCompileShader(id);
 }
 
-bool compileStage(const GLuint id, const std::string shaderType, const std::string& shaderCode) {
+bool compile_stage(const GLuint id, const std::string shader_type, const std::string& shader_code) {
     GLint success{ GL_FALSE };
-    GLint logLength{ -1 };
 
-    compile(id, shaderCode.c_str());
+    compile(id, shader_code.c_str());
 
     glGetShaderiv(id, GL_COMPILE_STATUS, &success);
 
     if (success == GL_FALSE) {
-        GLint infoLogLen = 0;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogLen);
-        std::vector<GLchar> infoLog(infoLogLen);
-        glGetShaderInfoLog(id, infoLogLen, nullptr, infoLog.data());
-        std::cerr << "Failed to compile shader. Info log:\n" << infoLog.data() << std::endl;
+        GLint info_log_len = 0;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &info_log_len);
+        std::vector<GLchar> info_log(info_log_len);
+        glGetShaderInfoLog(id, info_log_len, nullptr, info_log.data());
+        std::cerr << "Failed to compile shader. Info log:\n" << info_log.data() << std::endl;
     }
 
     return success == GL_TRUE;
 }
 
-bool linkProgram(const GLuint id) {
+bool link_program(const GLuint id) {
     GLint success{ GL_FALSE };
-    GLint logLength{ -1 };
     
     glLinkProgram(id);
 
     glGetProgramiv(id, GL_LINK_STATUS, &success);
 
     if (success == GL_FALSE) {
-        GLint infoLogLen = 0;
-        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &infoLogLen);
-        std::vector<GLchar> infoLog(infoLogLen);
-        glGetProgramInfoLog(id, infoLogLen, nullptr, infoLog.data());
-        std::cerr << "Failed to link shader program. Info log:\n" << infoLog.data() << std::endl;
+        GLint info_log_len = 0;
+        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &info_log_len);
+        std::vector<GLchar> info_log(info_log_len);
+        glGetProgramInfoLog(id, info_log_len, nullptr, info_log.data());
+        std::cerr << "Failed to link shader program. Info log:\n" << info_log.data() << std::endl;
     }
 
     return success == GL_TRUE;
 }
 
-gl_shader_program::gl_shader_program(const std::string programName, const std::vector<shader_create_info> stages)
-    : m_programName(programName) {
+gl_shader_program::gl_shader_program(const std::string program_name, const std::vector<shader_create_info> stages)
+    : m_program_name(program_name) {
 
-    std::cout << "Building shader program " << programName << std::endl;
+    std::cout << "Building shader program " << program_name << std::endl;
 
-    std::vector<GLuint> shaderIds;
+    std::vector<GLuint> shader_ids;
 
     bool success { true };
     for (auto i = 0; i < stages.size(); ++i) {
         auto id{ glCreateShader(GL_SHADER_TYPE_ENUM.at(stages[i].type)) };
-        shaderIds.push_back(id);
+        shader_ids.push_back(id);
 
-        auto shaderCode{ resource_manager::get_instance().load_text_file(stages[i].filePath) };
-        scanForIncludes(shaderCode);
+        auto shader_code{ resource_manager::get_instance().load_text_file(stages[i].file_path) };
+        scan_for_includes(shader_code);
 
-        if (!compileStage(id, stages[i].type, shaderCode)) {
+        if (!compile_stage(id, stages[i].type, shader_code)) {
             success = false;
             break;
         }
     }
 
     if (!success) {
-        for (const auto id : shaderIds) {
+        for (const auto id : shader_ids) {
             glDeleteShader(id);
         }
         std::cout << "Create shaders failed!" << std::endl;
         return;
     }
 
-    m_programID = glCreateProgram();
+    m_program_id = glCreateProgram();
 
-    for (const auto id : shaderIds) {
-        glAttachShader(m_programID, id);
+    for (const auto id : shader_ids) {
+        glAttachShader(m_program_id, id);
     }
 
-    if (!linkProgram(m_programID)) {
-        for (const auto id : shaderIds) {
-            glDetachShader(m_programID, id);
+    if (!link_program(m_program_id)) {
+        for (const auto id : shader_ids) {
+            glDetachShader(m_program_id, id);
             glDeleteShader(id);
         }
-        glDeleteProgram(m_programID);
+        glDeleteProgram(m_program_id);
         std::cout << "Create shader program failed!" << std::endl;
         return;
     }
@@ -129,63 +127,63 @@ gl_shader_program::~gl_shader_program() {
 }
 
 void gl_shader_program::bind() const {
-    assert(m_programID != 0);
+    assert(m_program_id != 0);
 
-    glUseProgram(m_programID);
+    glUseProgram(m_program_id);
 }
 
 void gl_shader_program::delete_program() const {
-    if (m_programID != 0) {
-        std::cout << "Deleting program: " << m_programName << '\n';
-        glDeleteProgram(m_programID);
+    if (m_program_id != 0) {
+        std::cout << "Deleting program: " << m_program_name << '\n';
+        glDeleteProgram(m_program_id);
     }
 }
 
-void gl_shader_program::set_uniform_i(const std::string& uniformName, const int value) {
-    glUniform1i(m_uniforms.at(uniformName), value);
+void gl_shader_program::set_uniform_i(const std::string& uniform_name, const int value) {
+    glUniform1i(m_uniforms.at(uniform_name), value);
 }
 
-void gl_shader_program::set_uniform_f(const std::string& uniformName, const float value) {
-    glUniform1f(m_uniforms.at(uniformName), value);
+void gl_shader_program::set_uniform_f(const std::string& uniform_name, const float value) {
+    glUniform1f(m_uniforms.at(uniform_name), value);
 }
 
-void gl_shader_program::set_uniform(const std::string& uniformName, const glm::ivec2& value) {
-    glUniform2iv(m_uniforms.at(uniformName), 1, &value[0]);
+void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::ivec2& value) {
+    glUniform2iv(m_uniforms.at(uniform_name), 1, &value[0]);
 }
 
-void gl_shader_program::set_uniform(const std::string& uniformName, const glm::vec2& value) {
-    glUniform2f(m_uniforms.at(uniformName), value.x, value.y);
+void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::vec2& value) {
+    glUniform2f(m_uniforms.at(uniform_name), value.x, value.y);
 }
 
-void gl_shader_program::set_uniform(const std::string& uniformName, const glm::vec3& value) {
-    glUniform3f(m_uniforms.at(uniformName), value.x, value.y, value.z);
+void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::vec3& value) {
+    glUniform3f(m_uniforms.at(uniform_name), value.x, value.y, value.z);
 }
 
-void gl_shader_program::set_uniform(const std::string& uniformName, const glm::vec4& value) {
-    glUniform4f(m_uniforms.at(uniformName), value.x, value.y, value.z, value.w);
+void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::vec4& value) {
+    glUniform4f(m_uniforms.at(uniform_name), value.x, value.y, value.z, value.w);
 }
 
-void gl_shader_program::set_uniform(const std::string& uniformName, const glm::mat3x3& value) {
-    glUniformMatrix3fv(m_uniforms.at(uniformName), 1, GL_FALSE, value_ptr(value));
+void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::mat3x3& value) {
+    glUniformMatrix3fv(m_uniforms.at(uniform_name), 1, GL_FALSE, value_ptr(value));
 }
 
-void gl_shader_program::set_uniform(const std::string& uniformName, const glm::mat4x4& value) {
-    glUniformMatrix4fv(m_uniforms.at(uniformName), 1, GL_FALSE, value_ptr(value));
+void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::mat4x4& value) {
+    glUniformMatrix4fv(m_uniforms.at(uniform_name), 1, GL_FALSE, value_ptr(value));
 }
 
 void gl_shader_program::collect_uniforms() {
     int total = -1;
-    glGetProgramiv(m_programID, GL_ACTIVE_UNIFORMS, &total);
+    glGetProgramiv(m_program_id, GL_ACTIVE_UNIFORMS, &total);
 
     for (auto i = 0; i < total; ++i) {
         auto name_len = -1, num = -1;
         GLenum type = GL_ZERO;
         char name[100];
-        glGetActiveUniform(m_programID, static_cast<GLuint>(i), sizeof(name) - 1, &name_len, &num, &type, name);
+        glGetActiveUniform(m_program_id, static_cast<GLuint>(i), sizeof(name) - 1, &name_len, &num, &type, name);
         name[name_len] = 0;
 
-        const auto nameStr = std::string(name);
+        const auto name_str = std::string(name);
 
-        m_uniforms.try_emplace(nameStr, glGetUniformLocation(m_programID, name));
+        m_uniforms.try_emplace(name_str, glGetUniformLocation(m_program_id, name));
     }
 }

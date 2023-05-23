@@ -5,19 +5,19 @@
 
 class gl_vertex_array {
     public:
-        enum BufferType : int {
+        enum buffer_type : int {
             ARRAY = GL_ARRAY_BUFFER,
             ELEMENT = GL_ELEMENT_ARRAY_BUFFER
         };
 
-        enum DrawMode : int {
+        enum draw_mode : int {
             STATIC = GL_STATIC_DRAW,
             DYNAMIC = GL_DYNAMIC_DRAW,
             STREAM = GL_STREAM_DRAW
         };
 
         void init();
-        void attach_buffer(const BufferType type, const size_t size, const DrawMode mode, const void* data);
+        void attach_buffer(const buffer_type type, const size_t size, const draw_mode mode, const void* data);
         void bind() const;
         void enable_attribute(const GLuint index, const int size, const GLuint offset, const void* data);
         void destroy();
