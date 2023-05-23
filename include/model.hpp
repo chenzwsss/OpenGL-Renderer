@@ -11,8 +11,8 @@
 #include <assimp/postprocess.h>
 
 #include "mesh.hpp"
-#include "shader.hpp"
 #include "utility/resource_manager.h"
+#include "graphic/gl_shader_program.h"
 
 #include <string>
 #include <fstream>
@@ -27,7 +27,7 @@ class model
 {
 public:
     // model data 
-    vector<Texture> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+    vector<Texture> textures_loaded;    // stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
     vector<Mesh>    meshes;
     string directory;
     bool gammaCorrection;
@@ -39,7 +39,7 @@ public:
     }
 
     // draws the model, and thus all its meshes
-    void Draw(shader& shaderProgram)
+    void Draw(gl_shader_program& shaderProgram)
     {
         for (unsigned int i = 0; i < meshes.size(); i++)
             meshes[i].Draw(shaderProgram);

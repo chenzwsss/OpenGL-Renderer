@@ -3,7 +3,7 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "utility/resource_manager.h"
+#include "../utility/resource_manager.h"
 
 const std::unordered_map<std::string, int> GL_SHADER_TYPE_ENUM {
     { "vertex", GL_VERTEX_SHADER },
@@ -45,11 +45,14 @@ bool compileStage(const GLuint id, const std::string shaderType, const std::stri
     compile(id, shaderCode.c_str());
 
     glGetShaderiv(id, GL_COMPILE_STATUS, &success);
-    glGetShaderiv(id, GL_INFO_LOG_LENGTH, &logLength);
 
-    std::vector<GLchar> infoLog(0, logLength);
-    glGetShaderInfoLog(id, logLength, nullptr, infoLog.data());
-    std::cout << "Compile " << shaderType << "shader error: " << &infoLog << std::endl;
+    if (success == GL_FALSE) {
+        GLint infoLogLen = 0;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogLen);
+        std::vector<GLchar> infoLog(infoLogLen);
+        glGetShaderInfoLog(id, infoLogLen, nullptr, infoLog.data());
+        std::cerr << "Failed to compile shader. Info log:\n" << infoLog.data() << std::endl;
+    }
 
     return success == GL_TRUE;
 }
@@ -59,12 +62,16 @@ bool linkProgram(const GLuint id) {
     GLint logLength{ -1 };
     
     glLinkProgram(id);
-    glGetProgramiv(id, GL_LINK_STATUS, &success);
-    glGetProgramiv(id, GL_INFO_LOG_LENGTH, &logLength);
 
-    std::vector<GLchar> infoLog(0, logLength);
-    glGetProgramInfoLog(id, logLength, nullptr, infoLog.data());
-    std::cout << &infoLog << std::endl;
+    glGetProgramiv(id, GL_LINK_STATUS, &success);
+
+    if (success == GL_FALSE) {
+        GLint infoLogLen = 0;
+        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &infoLogLen);
+        std::vector<GLchar> infoLog(infoLogLen);
+        glGetProgramInfoLog(id, infoLogLen, nullptr, infoLog.data());
+        std::cerr << "Failed to link shader program. Info log:\n" << infoLog.data() << std::endl;
+    }
 
     return success == GL_TRUE;
 }
@@ -111,6 +118,7 @@ gl_shader_program::gl_shader_program(const std::string programName, const std::v
         }
         glDeleteProgram(m_programID);
         std::cout << "Create shader program failed!" << std::endl;
+        return;
     }
 
     collectUniforms();

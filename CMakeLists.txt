@@ -40,9 +40,20 @@ endif(WIN32)
 set(SOURCES
     src/main.cpp
     ${PROJECT_SOURCE_DIR}/3rdParty/glad/src/glad.c
+    src/graphic/gl_vertex_array.h
     src/graphic/gl_vertex_array.cpp
+    src/graphic/gl_shader_program.h
+    src/graphic/gl_shader_program.cpp
+    src/utility/resource_manager.h
     src/utility/resource_manager.cpp
-    src/skybox.cpp
+    src/base/skybox.h
+    src/base/skybox.cpp
+    src/base/mesh.h
+    src/base/mesh.cpp
+    src/base/model.h
+    src/base/model.cpp
+    src/base/pbr_material.h
+    src/base/pbr_material.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
