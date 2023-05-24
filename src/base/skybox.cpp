@@ -101,8 +101,8 @@ void skybox::init(const std::string hdr_path, const GLsizei resolution) {
     };
 
     gl_shader_program convertToCubemapShader{ "Equirectangular to Cubemap Shader", {
-        {"shaders/cubemapvs.glsl", "vertex"},
-        {"shaders/cubemapconverterps.glsl", "fragment"}
+        {"shaders/cubemap_vs.glsl", "vertex"},
+        {"shaders/cubemapconverter_ps.glsl", "fragment"}
     } };
 
     convertToCubemapShader.bind();
@@ -151,8 +151,8 @@ void skybox::init(const std::string hdr_path, const GLsizei resolution) {
 
     // Solve diffuse integral by convolution to create an irradiance cubemap
     gl_shader_program irradianceShader{"Irradiance Shader", {
-        {"shaders/cubemapvs.glsl", "vertex"},
-        {"shaders/irradianceConvolutionps.glsl", "fragment"}
+        {"shaders/cubemap_vs.glsl", "vertex"},
+        {"shaders/irradianceConvolution_ps.glsl", "fragment"}
     }};
 
     irradianceShader.bind();
@@ -191,8 +191,8 @@ void skybox::init(const std::string hdr_path, const GLsizei resolution) {
     // Run quasi monte-carlo simulation on the environment lighting to create a prefilter cubemap (since we can't integrate over infinite directions).
     // Pre-filter the environment map with different roughness values over multiple mipmap levels
     gl_shader_program prefilterShader{"Pre-filter Shader", {
-        {"shaders/cubemapvs.glsl", "vertex"},
-        {"shaders/prefilterps.glsl", "fragment"}
+        {"shaders/cubemap_vs.glsl", "vertex"},
+        {"shaders/prefilter_ps.glsl", "fragment"}
     }};
 
     prefilterShader.bind();
@@ -242,8 +242,8 @@ void skybox::init(const std::string hdr_path, const GLsizei resolution) {
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_brdf_lut, 0);
 
     gl_shader_program brdfShader{"BRDF Shader", {
-        {"shaders/brdfvs.glsl", "vertex"},
-        {"shaders/brdfps.glsl", "fragment"}
+        {"shaders/brdf_vs.glsl", "vertex"},
+        {"shaders/brdf_ps.glsl", "fragment"}
     }};
 
     brdfShader.bind();

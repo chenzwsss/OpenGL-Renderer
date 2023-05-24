@@ -9,11 +9,13 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+#include <stb_image.h>
+
 #include <string>
 #include <iostream>
 
 #include "base/render_camera.hpp"
-#include "model.hpp"
+#include "base/model.h"
 #include "utility/resource_manager.h"
 #include "graphic/gl_shader_program.h"
 
@@ -46,7 +48,7 @@ bool first_mouse = true;
 float delta_time = 0.0f;
 float last_frame = 0.0f;
 
-std::string WINDOW_NAME = "OpenGL_Renderer";
+std::string WINDOW_NAME = "opengl_renderer";
 
 struct {
     bool left = false;
@@ -72,7 +74,7 @@ void render_imgui()
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     {
-        ImGui::Begin("OPGL Status");
+        ImGui::Begin("opengl status");
         ImGuiIO& io = ImGui::GetIO();
         ImGui::Text("%.1f FPS(%.3f ms/frame)", io.Framerate, 1000.0f / io.Framerate);
         ImGui::End();
@@ -81,6 +83,7 @@ void render_imgui()
     // ImGui draw
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+
 
 int main() {
     // glfw: initialize and configure
@@ -146,24 +149,25 @@ int main() {
     }};
 
     gl_shader_program skybox_shader{"Skybox Shader", {
-        {"shaders/skyboxvs.glsl", "vertex"},
-        {"shaders/skyboxps.glsl", "fragment"}
+        {"shaders/skybox_vs.glsl", "vertex"},
+        {"shaders/skybox_ps.glsl", "fragment"}
     }};
 
     pbr_shader.bind();
-    pbr_shader.set_uniform_i("irradianceMap", 0);
+    pbr_shader.set_uniform_i("albedoMap", 0);
+    /*pbr_shader.set_uniform_i("irradianceMap", 0);
     pbr_shader.set_uniform_i("prefilterMap", 1);
     pbr_shader.set_uniform_i("brdfLUT", 2);
     pbr_shader.set_uniform_i("albedoMap", 3);
     pbr_shader.set_uniform_i("normalMap", 4);
     pbr_shader.set_uniform_i("metallicMap", 5);
-    pbr_shader.set_uniform_i("roughnessMap", 6);
+    pbr_shader.set_uniform_i("roughnessMap", 6);*/
 
     skybox_shader.bind();
     skybox_shader.set_uniform_i("environmentMap", 0);
 
-    // Titanium
-    //model human_model(resource_manager::get_assets_path() + "models/nanosuit/nanosuit.obj");
+    // model
+    model model_nanosuit("models/nanosuit/nanosuit.obj", "nanosuit");
 
     // lights
     // ------
@@ -209,28 +213,26 @@ int main() {
         // render scene, supplying the convoluted irradiance map to the final shader.
         // ------------------------------------------------------------------------------------------
         pbr_shader.bind();
-        glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = camera.matrices.view;
         pbr_shader.set_uniform("view", view);
-        pbr_shader.set_uniform("camPos", camera.position);
+        //pbr_shader.set_uniform("camPos", camera.position);
 
-        // bind pre-computed IBL data
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_irradiance_map());
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_prefilter_map());
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, env_skybox.get_brdf_lut());
+        //// bind pre-computed IBL data
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_irradiance_map());
+        //glActiveTexture(GL_TEXTURE1);
+        //glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_prefilter_map());
+        //glActiveTexture(GL_TEXTURE2);
+        //glBindTexture(GL_TEXTURE_2D, env_skybox.get_brdf_lut());
 
-        //// model
-        //model = glm::mat4(1.0f);
-        //model = glm::translate(model, glm::vec3(-3.0, 0.0, 2.0));
-        //pbr_shader.set_uniform("model", model);
-        //human_model.Draw(pbr_shader);
+        // model
+        model_nanosuit.translate(glm::vec3(0.0f, -7.0f, 0.0f));
+        model_nanosuit.scale(glm::vec3(0.2f));
+        model_nanosuit.draw(pbr_shader);
 
         glm::vec3 new_pos = light_position + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
-        pbr_shader.set_uniform("lightPosition", new_pos);
-        pbr_shader.set_uniform("lightColor", light_color);
+        /*pbr_shader.set_uniform("lightPosition", new_pos);
+        pbr_shader.set_uniform("lightColor", light_color);*/
 
         // render skybox (render as last to prevent overdraw)
         skybox_shader.bind();

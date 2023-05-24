@@ -48,8 +48,8 @@ set(SOURCES
     src/utility/resource_manager.cpp
     src/base/skybox.h
     src/base/skybox.cpp
-    src/base/mesh.h
-    src/base/mesh.cpp
+    src/base/base_mesh.h
+    src/base/base_mesh.cpp
     src/base/model.h
     src/base/model.cpp
     src/base/pbr_material.h

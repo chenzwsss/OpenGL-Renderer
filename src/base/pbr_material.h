@@ -55,6 +55,7 @@ class pbr_material {
         unsigned int m_alpha_mask_texture;
 };
 
+// using pbr_material_ptr = std::shared_ptr<pbr_material>;
 using pbr_material_ptr = std::shared_ptr<pbr_material>;
 
 #endif

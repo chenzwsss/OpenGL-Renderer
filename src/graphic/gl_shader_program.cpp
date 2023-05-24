@@ -77,7 +77,9 @@ bool link_program(const GLuint id) {
 gl_shader_program::gl_shader_program(const std::string program_name, const std::vector<shader_create_info> stages)
     : m_program_name(program_name) {
 
+#ifndef _DEBUG
     std::cout << "Building shader program " << program_name << std::endl;
+#endif
 
     std::vector<GLuint> shader_ids;
 
@@ -134,7 +136,9 @@ void gl_shader_program::bind() const {
 
 void gl_shader_program::delete_program() const {
     if (m_program_id != 0) {
+#ifndef _DEBUG
         std::cout << "Deleting program: " << m_program_name << '\n';
+#endif
         glDeleteProgram(m_program_id);
     }
 }
