@@ -19,6 +19,7 @@ class gl_vertex_array {
         void init();
         void attach_buffer(const buffer_type type, const size_t size, const draw_mode mode, const void* data);
         void bind() const;
+        void unbind() const;
         void enable_attribute(const GLuint index, const int size, const GLuint offset, const void* data);
         void destroy();
 

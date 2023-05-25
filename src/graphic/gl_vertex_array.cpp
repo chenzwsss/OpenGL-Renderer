@@ -16,6 +16,10 @@ void gl_vertex_array::bind() const {
     glBindVertexArray(m_vao);
 }
 
+void gl_vertex_array::unbind() const {
+    glBindVertexArray(0);
+}
+
 void gl_vertex_array::enable_attribute(const GLuint index, const int size, const GLuint offset, const void* data) {
     glEnableVertexAttribArray(index);
     glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, offset, data);

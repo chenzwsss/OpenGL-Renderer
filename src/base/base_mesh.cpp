@@ -39,9 +39,10 @@ void base_mesh::draw(gl_shader_program& shader) {
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, this->material->get_parameter_texture(pbr_material::ROUGHNESS));
 
-	this->vao.bind();
+	vao.bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->index_count), GL_UNSIGNED_INT, nullptr);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	vao.unbind();
 }
 
 void base_mesh::setup_mesh(const std::vector<vertex>& vertices, const std::vector<GLuint>& indices) {
