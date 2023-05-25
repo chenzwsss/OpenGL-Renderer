@@ -48,6 +48,7 @@ set(SOURCES
     src/utility/resource_manager.cpp
     src/utility/imgui_renderer.h
     src/utility/imgui_renderer.cpp
+    src/base/vertex.h
     src/base/skybox.h
     src/base/skybox.cpp
     src/base/base_mesh.h

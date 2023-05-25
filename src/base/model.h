@@ -15,6 +15,14 @@ struct aiMesh;
 
 class model {
     public:
+        struct MaterialParams {
+            float metallic_factor;
+            float roughness_factor;
+            int metallic_texture_set;
+            int normal_texture_set;
+            int roughness_texture_set;
+        } materialParams;
+
         model() = default;
         model(const std::string path, const std::string name, const bool flip_winding_order = false, const bool load_material = true);
         model(const std::string name, const std::vector<vertex>& vertices, const std::vector<GLuint>& indices, const pbr_material_ptr& material);
@@ -51,6 +59,8 @@ class model {
         std::string m_path;
 
         std::size_t m_num_mats = 0;
+
+        GLuint m_mesh_material_ubo;
 };
 
 #endif

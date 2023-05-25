@@ -14,8 +14,6 @@ struct base_mesh {
 
     void draw(gl_shader_program& shader);
 
-    void set_uniform_buffer();
-
     auto get_triangle_count() const { return index_count / 3; }
 
     const std::size_t index_count;

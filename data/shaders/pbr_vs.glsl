@@ -17,6 +17,7 @@ out vec2 vTexCoords;
 
 void main() {
     vTexCoords = aTexCoords;
+
     vWorldPos = vec3(modelMatrix * vec4(aPosition, 1.0));
     vNormal = mat3(modelMatrix) * aNormal;
 

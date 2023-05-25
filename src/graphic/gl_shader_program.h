@@ -31,10 +31,7 @@ class gl_shader_program {
         auto get_program_name() const { return m_program_name; }
 
     private:
-        // void collect_uniforms();
         GLuint get_uniform_location(const std::string& uniform_name);
-
-        // std::unordered_map<std::string, int> m_uniforms;
 
         GLuint m_program_id { 0 };
         std::string m_program_name;

@@ -120,8 +120,6 @@ gl_shader_program::gl_shader_program(const std::string program_name, const std::
         std::cout << "Create shader program failed!" << std::endl;
         return;
     }
-
-    // collect_uniforms();
 }
 
 gl_shader_program::~gl_shader_program() {
@@ -179,20 +177,3 @@ void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::
 GLuint gl_shader_program::get_uniform_location(const std::string& uniform_name) {
     return glGetUniformLocation(m_program_id, uniform_name.c_str());
 }
-
-//void gl_shader_program::collect_uniforms() {
-//    int total = -1;
-//    glGetProgramiv(m_program_id, GL_ACTIVE_UNIFORMS, &total);
-//
-//    for (auto i = 0; i < total; ++i) {
-//        auto name_len = -1, num = -1;
-//        GLenum type = GL_ZERO;
-//        char name[100];
-//        glGetActiveUniform(m_program_id, static_cast<GLuint>(i), sizeof(name) - 1, &name_len, &num, &type, name);
-//        name[name_len] = 0;
-//
-//        const auto name_str = std::string(name);
-//
-//        m_uniforms.try_emplace(name_str, glGetUniformLocation(m_program_id, name));
-//    }
-//}

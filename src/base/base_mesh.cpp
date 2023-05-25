@@ -6,38 +6,23 @@ base_mesh::base_mesh(const std::vector<vertex>& vertices, const std::vector<GLui
 	: index_count(indices.size())
 {
 	setup_mesh(vertices, indices);
-	set_uniform_buffer();
 }
 
 base_mesh::base_mesh(const std::vector<vertex>& vertices, const std::vector<GLuint>& indices, const pbr_material_ptr& material)
 	: index_count(indices.size()), material(material)
 {
 	setup_mesh(vertices, indices);
-	set_uniform_buffer();
-}
-
-void base_mesh::set_uniform_buffer() {
-	
 }
 
 void base_mesh::draw(gl_shader_program& shader) {
-	/*glActiveTexture(GL_TEXTURE3);
+	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, this->material->get_parameter_texture(pbr_material::ALBEDO));
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, this->material->get_parameter_texture(pbr_material::NORMAL));
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, this->material->get_parameter_texture(pbr_material::METALLIC));
 	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, this->material->get_parameter_texture(pbr_material::ROUGHNESS));*/
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, material->get_parameter_texture(pbr_material::ALBEDO));
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, material->get_parameter_texture(pbr_material::NORMAL));
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, material->get_parameter_texture(pbr_material::METALLIC));
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, material->get_parameter_texture(pbr_material::ROUGHNESS));
+	glBindTexture(GL_TEXTURE_2D, this->material->get_parameter_texture(pbr_material::ROUGHNESS));
 
 	vao.bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(index_count), GL_UNSIGNED_INT, nullptr);
@@ -59,10 +44,12 @@ void base_mesh::setup_mesh(const std::vector<vertex>& vertices, const std::vecto
 	const static auto vertex_size = sizeof(vertex);
 	// Position
 	vao.enable_attribute(0, 3, vertex_size, nullptr);
-	// Texture Coords
-	vao.enable_attribute(1, 2, vertex_size, reinterpret_cast<void*>(offsetof(vertex, TexCoords)));
 	// Normal
-	vao.enable_attribute(2, 3, vertex_size, reinterpret_cast<void*>(offsetof(vertex, Normal)));
+	vao.enable_attribute(1, 3, vertex_size, reinterpret_cast<void*>(offsetof(vertex, Normal)));
+	// Texture Coord 0
+	vao.enable_attribute(2, 2, vertex_size, reinterpret_cast<void*>(offsetof(vertex, TexCoords)));
 	// Tangent
 	vao.enable_attribute(3, 3, vertex_size, reinterpret_cast<void*>(offsetof(vertex, Tangent)));
+	// Bitangent
+	vao.enable_attribute(4, 3, vertex_size, reinterpret_cast<void*>(offsetof(vertex, Bitangent)));
 }

@@ -66,6 +66,11 @@ struct {
     bool middle = false;
 } mouse_buttons;
 
+struct LightSource {
+    glm::vec3 color = glm::vec3(1.0f);
+    glm::vec3 rotation = glm::vec3(75.0f, 40.0f, 0.0f);
+} lightSource;
+
 int main() {
     // glfw: initialize and configure
     // ------------------------------
@@ -125,7 +130,7 @@ int main() {
     camera.type = render_camera::camera_type::lookat;
     camera.set_perspective(45.0f, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 256.0f);
     camera.rotation_speed = 0.1f;
-    camera.movement_speed = 0.1f;
+    camera.movement_speed = 0.5f;
     camera.set_position({ 0.0f, 0.0f, -5.0f });
     camera.set_rotation({ 0.0f, 0.0f, 0.0f });
 
@@ -141,17 +146,13 @@ int main() {
     }};
 
     pbr_shader.bind();
-    pbr_shader.set_uniform_i("albedoMap", 0);
-    pbr_shader.set_uniform_i("normalMap", 1);
-    pbr_shader.set_uniform_i("metallicMap", 2);
-    pbr_shader.set_uniform_i("roughnessMap", 3);
-    /*pbr_shader.set_uniform_i("irradianceMap", 0);
+    pbr_shader.set_uniform_i("irradianceMap", 0);
     pbr_shader.set_uniform_i("prefilterMap", 1);
     pbr_shader.set_uniform_i("brdfLUT", 2);
     pbr_shader.set_uniform_i("albedoMap", 3);
     pbr_shader.set_uniform_i("normalMap", 4);
     pbr_shader.set_uniform_i("metallicMap", 5);
-    pbr_shader.set_uniform_i("roughnessMap", 6);*/
+    pbr_shader.set_uniform_i("roughnessMap", 6);
 
     skybox_shader.bind();
     skybox_shader.set_uniform_i("environmentMap", 0);
@@ -159,14 +160,9 @@ int main() {
     // model
     model model_nanosuit("models/nanosuit/nanosuit.obj", "nanosuit");
 
-    // lights
-    // ------
-    glm::vec3 light_position = glm::vec3(-10.0f, 10.0f, 10.0f);
-    glm::vec3 light_color = glm::vec3(300.0f, 300.0f, 300.0f);
-
     // skybox
     skybox env_skybox;
-    env_skybox.init("textures/hdr/newport_loft.hdr", 2048);
+    env_skybox.init("textures/hdr/hdriHaven4k.hdr", 512);
 
     // initialize static shader uniforms before rendering
     // --------------------------------------------------
@@ -179,6 +175,16 @@ int main() {
     int scr_width, scr_height;
     glfwGetFramebufferSize(window, &scr_width, &scr_height);
     glViewport(0, 0, scr_width, scr_height);
+
+    // set light direction
+    glm::vec4 lightDir = glm::vec4(
+        sin(glm::radians(lightSource.rotation.x)) * cos(glm::radians(lightSource.rotation.y)),
+        sin(glm::radians(lightSource.rotation.y)),
+        cos(glm::radians(lightSource.rotation.x)) * cos(glm::radians(lightSource.rotation.y)),
+        0.0f);
+    pbr_shader.bind();
+    pbr_shader.set_uniform("lightDir", lightDir);
+    pbr_shader.set_uniform("lightColor", lightSource.color);
 
     // render loop
     // -----------
@@ -193,6 +199,8 @@ int main() {
         // -----
         process_input(window);
 
+        camera.update(delta_time);
+
         // render
         // ------
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -204,27 +212,28 @@ int main() {
         glBindBuffer(GL_UNIFORM_BUFFER, m_uboMatrices);
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(view));
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
-        // pbr_shader.set_uniform("view", view);
-        //pbr_shader.set_uniform("camPos", camera.position);
 
-        //// bind pre-computed IBL data
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_irradiance_map());
-        //glActiveTexture(GL_TEXTURE1);
-        //glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_prefilter_map());
-        //glActiveTexture(GL_TEXTURE2);
-        //glBindTexture(GL_TEXTURE_2D, env_skybox.get_brdf_lut());
+        // bind pre-computed IBL data
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_irradiance_map());
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_prefilter_map());
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, env_skybox.get_brdf_lut());
+
+        glm::vec3 camPos = glm::vec3(
+            camera.position.z * sin(glm::radians(camera.rotation.y)) * cos(glm::radians(camera.rotation.x)),
+            -camera.position.z * sin(glm::radians(camera.rotation.x)),
+            -camera.position.z * cos(glm::radians(camera.rotation.y)) * cos(glm::radians(camera.rotation.x))
+        );
 
         pbr_shader.bind();
+        pbr_shader.set_uniform("camPos", camPos);
 
         // model
-        model_nanosuit.translate(glm::vec3(0.0f, -7.0f, 0.0f));
-        model_nanosuit.scale(glm::vec3(0.2f));
+        model_nanosuit.translate(glm::vec3(0.0f, -7.0f, 1.0f));
+        model_nanosuit.scale(glm::vec3(0.8f));
         model_nanosuit.draw(pbr_shader);
-
-        glm::vec3 new_pos = light_position + glm::vec3(sin(glfwGetTime() * 5.0) * 5.0, 0.0, 0.0);
-        /*pbr_shader.set_uniform("lightPosition", new_pos);
-        pbr_shader.set_uniform("lightColor", light_color);*/
 
         // render skybox (render as last to prevent overdraw)
         skybox_shader.bind();

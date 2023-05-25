@@ -48,19 +48,36 @@ void model::translate(const glm::vec3& pos) {
 }
 
 glm::mat4 model::get_model_matrix() const {
-    const auto scale = glm::scale(glm::mat4(1.0f), m_scale);
-    const auto translate = glm::translate(glm::mat4(1.0f), m_position);
-    const auto rotate = glm::rotate(glm::mat4(1.0f), glm::radians(m_degrees), m_axis);
-    return scale * translate * rotate;
+    glm::mat4 model = glm::mat4(1.0);
+    model = glm::rotate(model, glm::radians(m_degrees), m_axis);
+    model = glm::translate(model, m_position);
+    model = glm::scale(model, m_scale);
+    return model;
 }
 
 void model::draw(gl_shader_program& shader) {
 
     // Set model matrix
-    shader.set_uniform("modelMatrix", this->get_model_matrix());
+     shader.set_uniform("modelMatrix", get_model_matrix());
+
+    glGenBuffers(1, &m_mesh_material_ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, m_mesh_material_ubo);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(MaterialParams), nullptr, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 1, m_mesh_material_ubo);
 
     auto& meshes = this->get_meshes();
     for (auto& mesh : meshes) {
+
+        MaterialParams params = materialParams;
+        params.metallic_factor = 1.0f;
+        params.roughness_factor = 0.0f;
+        params.metallic_texture_set = (mesh.material && mesh.material->get_parameter_texture(pbr_material::METALLIC) != 0) ? 1 : -1;
+        params.normal_texture_set = (mesh.material && mesh.material->get_parameter_texture(pbr_material::NORMAL) != 0) ? 1 : -1;
+        params.roughness_texture_set = (mesh.material && mesh.material->get_parameter_texture(pbr_material::ROUGHNESS) != 0) ? 1 : -1;
+        glBindBuffer(GL_UNIFORM_BUFFER, m_mesh_material_ubo);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(MaterialParams), &params);
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
         mesh.draw(shader);
     }
 }
@@ -83,29 +100,29 @@ bool model::load_model(const std::string path, const bool flip_winding_order, co
     const aiScene* scene = nullptr;
     if (flip_winding_order) {
         scene = importer.ReadFile(new_path, aiProcess_Triangulate |
-                                  aiProcess_JoinIdenticalVertices |
-                                  aiProcess_GenUVCoords |
-                                  aiProcess_SortByPType |
-                                  aiProcess_RemoveRedundantMaterials |
-                                  aiProcess_FindInvalidData |
-                                  aiProcess_FlipUVs |
-                                  aiProcess_FlipWindingOrder | // Reverse back-face culling
-                                  aiProcess_CalcTangentSpace |
-                                  aiProcess_OptimizeMeshes |
-                                  aiProcess_SplitLargeMeshes);
+                                aiProcess_JoinIdenticalVertices |
+                                aiProcess_GenUVCoords |
+                                aiProcess_SortByPType |
+                                aiProcess_RemoveRedundantMaterials |
+                                aiProcess_FindInvalidData |
+                                aiProcess_FlipUVs |
+                                aiProcess_FlipWindingOrder | // Reverse back-face culling
+                                aiProcess_CalcTangentSpace |
+                                aiProcess_OptimizeMeshes |
+                                aiProcess_SplitLargeMeshes);
     } else {
         scene = importer.ReadFile(new_path, aiProcess_Triangulate |
-                                  aiProcess_JoinIdenticalVertices |
-                                  aiProcess_GenUVCoords |
-                                  aiProcess_SortByPType |
-                                  aiProcess_RemoveRedundantMaterials |
-                                  aiProcess_FindInvalidData |
-                                  aiProcess_FlipUVs |
-                                  aiProcess_CalcTangentSpace |
-                                  aiProcess_GenSmoothNormals |
-                                  aiProcess_ImproveCacheLocality |
-                                  aiProcess_OptimizeMeshes |
-                                  aiProcess_SplitLargeMeshes);
+                                aiProcess_JoinIdenticalVertices |
+                                aiProcess_GenUVCoords |
+                                aiProcess_SortByPType |
+                                aiProcess_RemoveRedundantMaterials |
+                                aiProcess_FindInvalidData |
+                                aiProcess_FlipUVs |
+                                aiProcess_CalcTangentSpace |
+                                aiProcess_GenSmoothNormals |
+                                aiProcess_ImproveCacheLocality |
+                                aiProcess_OptimizeMeshes |
+                                aiProcess_SplitLargeMeshes);
     }
 
     if (!scene || scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
@@ -137,27 +154,37 @@ void model::process_node(aiNode* node, const aiScene* scene, const bool load_mat
 }
 
 base_mesh model::process_mesh(aiMesh* mesh, const aiScene* scene, const bool load_material) {
-    std::vector<vertex> vertices;
-
     // vertices
+    std::vector<vertex> vertices;
     for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
         vertex v;
 
+        // positions
         if (mesh->HasPositions()) {
             v.Position.x = mesh->mVertices[i].x;
             v.Position.y = mesh->mVertices[i].y;
             v.Position.z = mesh->mVertices[i].z;
         }
+
+        // normals
         if (mesh->HasNormals()) {
             v.Normal.x = mesh->mNormals[i].x;
             v.Normal.y = mesh->mNormals[i].y;
             v.Normal.z = mesh->mNormals[i].z;
         }
+
+        // tangents and bitangents
         if (mesh->HasTangentsAndBitangents()) {
             v.Tangent.x = mesh->mTangents[i].x;
             v.Tangent.y = mesh->mTangents[i].y;
             v.Tangent.z = mesh->mTangents[i].z;
+
+            v.Bitangent.x = mesh->mBitangents[i].x;
+            v.Bitangent.y = mesh->mBitangents[i].y;
+            v.Bitangent.z = mesh->mBitangents[i].z;
         }
+
+        // texcoord0
         if (mesh->HasTextureCoords(0) && load_material) {
             v.TexCoords.x = mesh->mTextureCoords[0][i].x;
             v.TexCoords.y = mesh->mTextureCoords[0][i].y;
@@ -202,6 +229,9 @@ base_mesh model::process_mesh(aiMesh* mesh, const aiScene* scene, const bool loa
             aiString alphaMask_path;
             mat->GetTexture(aiTextureType_OPACITY, 0, &alphaMask_path);
 
+#ifdef _DEBUG
+            std::cout << albedo_path.C_Str() << "," << metallic_path.C_Str() << "," << normal_path.C_Str() << "," << roughness_path.C_Str() << "," << alphaMask_path.C_Str() << "," << std::endl;
+#endif // _DEBUG
 
             albedo_path = std::strcmp(albedo_path.C_Str(), "") == 0 ? "" : m_path + albedo_path.C_Str();
             metallic_path = std::strcmp(metallic_path.C_Str(), "") == 0 ? "" : m_path + metallic_path.C_Str();
