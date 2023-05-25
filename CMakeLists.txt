@@ -4,6 +4,26 @@ set(PROJECT_NAME opengl_renderer)
 
 project (${PROJECT_NAME})
 
+# target_include_directories(${PROJECT_NAME}
+#     PRIVATE
+#         ${PROJECT_SOURCE_DIR}/include
+#         ${PROJECT_SOURCE_DIR}/include/src
+#         ${PROJECT_SOURCE_DIR}/external/glad/include
+#         ${PROJECT_SOURCE_DIR}/external/glfw/include
+#         ${PROJECT_SOURCE_DIR}/external/glm
+#         ${PROJECT_SOURCE_DIR}/external/stb
+#         ${PROJECT_SOURCE_DIR}/external/imgui
+#         ${PROJECT_SOURCE_DIR}/external/assimp/include
+# )
+
+include_directories(src)
+include_directories(external/glad/include)
+include_directories(external/glfw/include)
+include_directories(external/glm)
+include_directories(external/stb)
+include_directories(external/imgui)
+include_directories(external/assimp/include)
+
 set(CMAKE_CXX_STANDARD 17) # this does nothing for MSVC, use target_compile_options below
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
@@ -39,7 +59,7 @@ endif(WIN32)
 
 set(SOURCES
     src/main.cpp
-    ${PROJECT_SOURCE_DIR}/3rdParty/glad/src/glad.c
+    ${PROJECT_SOURCE_DIR}/external/glad/src/glad.c
     src/graphic/gl_vertex_array.h
     src/graphic/gl_vertex_array.cpp
     src/graphic/gl_shader_program.h
@@ -65,19 +85,19 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory(3rdParty/glfw)
+add_subdirectory(external/glfw)
 set(LIBS ${LIBS} glfw)
 
 # glm
-add_subdirectory(3rdParty/glm)
+add_subdirectory(external/glm)
 set(LIBS ${LIBS} glm)
 
 # imgui
-add_subdirectory(3rdParty/imgui)
+add_subdirectory(external/imgui)
 set(LIBS ${LIBS} imgui)
 
 # stb_image
-add_library(stb_image ${PROJECT_SOURCE_DIR}/3rdParty/stb/stb_image.cpp)
+add_library(stb_image ${PROJECT_SOURCE_DIR}/external/stb/stb_image.cpp)
 set(LIBS ${LIBS} stb_image)
 
 # assimp
@@ -86,19 +106,7 @@ set(ASSIMP_WARNINGS_AS_ERRORS  OFF CACHE BOOL "" FORCE)
 set(ASSIMP_INJECT_DEBUG_POSTFIX  OFF CACHE BOOL "" FORCE)
 set(ASSIMP_INSTALL_PDB OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_ASSIMP_VIEW  OFF CACHE BOOL "" FORCE)
-add_subdirectory(3rdParty/assimp)
+add_subdirectory(external/assimp)
 set(LIBS ${LIBS} assimp)
 
 target_link_libraries(${PROJECT_NAME} ${LIBS})
-
-target_include_directories(${PROJECT_NAME}
-    PRIVATE
-        ${PROJECT_SOURCE_DIR}/include
-        ${PROJECT_SOURCE_DIR}/include/src
-        ${PROJECT_SOURCE_DIR}/3rdParty/glad/include
-        ${PROJECT_SOURCE_DIR}/3rdParty/glfw/include
-        ${PROJECT_SOURCE_DIR}/3rdParty/glm
-        ${PROJECT_SOURCE_DIR}/3rdParty/stb
-        ${PROJECT_SOURCE_DIR}/3rdParty/imgui
-        ${PROJECT_SOURCE_DIR}/3rdParty/assimp/include
-)
