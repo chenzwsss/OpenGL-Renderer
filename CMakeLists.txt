@@ -46,6 +46,8 @@ set(SOURCES
     src/graphic/gl_shader_program.cpp
     src/utility/resource_manager.h
     src/utility/resource_manager.cpp
+    src/utility/imgui_renderer.h
+    src/utility/imgui_renderer.cpp
     src/base/skybox.h
     src/base/skybox.cpp
     src/base/base_mesh.h

@@ -38,7 +38,7 @@ void compile(const GLuint id, const GLchar* shader_code) {
     glCompileShader(id);
 }
 
-bool compile_stage(const GLuint id, const std::string shader_type, const std::string& shader_code) {
+bool compile_stage(const GLuint id, const shader_create_info info, const std::string& shader_code) {
     GLint success{ GL_FALSE };
 
     compile(id, shader_code.c_str());
@@ -50,7 +50,7 @@ bool compile_stage(const GLuint id, const std::string shader_type, const std::st
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &info_log_len);
         std::vector<GLchar> info_log(info_log_len);
         glGetShaderInfoLog(id, info_log_len, nullptr, info_log.data());
-        std::cerr << "Failed to compile shader. Info log:\n" << info_log.data() << std::endl;
+        std::cerr << "Failed to compile shader. Shader path: " << info.file_path << ".\nInfo log:\n" << info_log.data() << std::endl;
     }
 
     return success == GL_TRUE;
@@ -77,7 +77,7 @@ bool link_program(const GLuint id) {
 gl_shader_program::gl_shader_program(const std::string program_name, const std::vector<shader_create_info> stages)
     : m_program_name(program_name) {
 
-#ifndef _DEBUG
+#ifdef _DEBUG
     std::cout << "Building shader program " << program_name << std::endl;
 #endif
 
@@ -91,7 +91,7 @@ gl_shader_program::gl_shader_program(const std::string program_name, const std::
         auto shader_code{ resource_manager::get_instance().load_text_file(stages[i].file_path) };
         scan_for_includes(shader_code);
 
-        if (!compile_stage(id, stages[i].type, shader_code)) {
+        if (!compile_stage(id, stages[i], shader_code)) {
             success = false;
             break;
         }
@@ -121,7 +121,7 @@ gl_shader_program::gl_shader_program(const std::string program_name, const std::
         return;
     }
 
-    collect_uniforms();
+    // collect_uniforms();
 }
 
 gl_shader_program::~gl_shader_program() {
@@ -136,58 +136,63 @@ void gl_shader_program::bind() const {
 
 void gl_shader_program::delete_program() const {
     if (m_program_id != 0) {
-#ifndef _DEBUG
-        std::cout << "Deleting program: " << m_program_name << '\n';
+
+#ifdef _DEBUG
+    std::cout << "Deleting program: " << m_program_name << '\n';
 #endif
         glDeleteProgram(m_program_id);
     }
 }
 
 void gl_shader_program::set_uniform_i(const std::string& uniform_name, const int value) {
-    glUniform1i(m_uniforms.at(uniform_name), value);
+    glUniform1i(get_uniform_location(uniform_name), value);
 }
 
 void gl_shader_program::set_uniform_f(const std::string& uniform_name, const float value) {
-    glUniform1f(m_uniforms.at(uniform_name), value);
+    glUniform1f(get_uniform_location(uniform_name), value);
 }
 
 void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::ivec2& value) {
-    glUniform2iv(m_uniforms.at(uniform_name), 1, &value[0]);
+    glUniform2iv(get_uniform_location(uniform_name), 1, &value[0]);
 }
 
 void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::vec2& value) {
-    glUniform2f(m_uniforms.at(uniform_name), value.x, value.y);
+    glUniform2f(get_uniform_location(uniform_name), value.x, value.y);
 }
 
 void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::vec3& value) {
-    glUniform3f(m_uniforms.at(uniform_name), value.x, value.y, value.z);
+    glUniform3f(get_uniform_location(uniform_name), value.x, value.y, value.z);
 }
 
 void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::vec4& value) {
-    glUniform4f(m_uniforms.at(uniform_name), value.x, value.y, value.z, value.w);
+    glUniform4f(get_uniform_location(uniform_name), value.x, value.y, value.z, value.w);
 }
 
 void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::mat3x3& value) {
-    glUniformMatrix3fv(m_uniforms.at(uniform_name), 1, GL_FALSE, value_ptr(value));
+    glUniformMatrix3fv(get_uniform_location(uniform_name), 1, GL_FALSE, value_ptr(value));
 }
 
 void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::mat4x4& value) {
-    glUniformMatrix4fv(m_uniforms.at(uniform_name), 1, GL_FALSE, value_ptr(value));
+    glUniformMatrix4fv(get_uniform_location(uniform_name), 1, GL_FALSE, value_ptr(value));
 }
 
-void gl_shader_program::collect_uniforms() {
-    int total = -1;
-    glGetProgramiv(m_program_id, GL_ACTIVE_UNIFORMS, &total);
-
-    for (auto i = 0; i < total; ++i) {
-        auto name_len = -1, num = -1;
-        GLenum type = GL_ZERO;
-        char name[100];
-        glGetActiveUniform(m_program_id, static_cast<GLuint>(i), sizeof(name) - 1, &name_len, &num, &type, name);
-        name[name_len] = 0;
-
-        const auto name_str = std::string(name);
-
-        m_uniforms.try_emplace(name_str, glGetUniformLocation(m_program_id, name));
-    }
+GLuint gl_shader_program::get_uniform_location(const std::string& uniform_name) {
+    return glGetUniformLocation(m_program_id, uniform_name.c_str());
 }
+
+//void gl_shader_program::collect_uniforms() {
+//    int total = -1;
+//    glGetProgramiv(m_program_id, GL_ACTIVE_UNIFORMS, &total);
+//
+//    for (auto i = 0; i < total; ++i) {
+//        auto name_len = -1, num = -1;
+//        GLenum type = GL_ZERO;
+//        char name[100];
+//        glGetActiveUniform(m_program_id, static_cast<GLuint>(i), sizeof(name) - 1, &name_len, &num, &type, name);
+//        name[name_len] = 0;
+//
+//        const auto name_str = std::string(name);
+//
+//        m_uniforms.try_emplace(name_str, glGetUniformLocation(m_program_id, name));
+//    }
+//}

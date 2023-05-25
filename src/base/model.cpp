@@ -11,7 +11,7 @@
 #include "../utility/resource_manager.h"
 
 model::model(const std::string path, const std::string name, const bool flip_winding_order, const bool load_material)
-    : m_scale(glm::vec3(1.0f)), m_position(glm::vec3(0.0f)), m_axis(glm::vec3(0.0f, 1.0f, 0.0f)), m_degrees(0.0f), m_num_mats(0)
+    : m_name(name)
 {
     if (!load_model(path, flip_winding_order, load_material)) {
         std::cerr << "Failed to load model: " << name << '\n';
@@ -19,13 +19,13 @@ model::model(const std::string path, const std::string name, const bool flip_win
 }
 
 model::model(const std::string name, const std::vector<vertex>& vertices, const std::vector<GLuint>& indices, const pbr_material_ptr& material)
-    : m_scale(glm::vec3(1.0f)), m_position(glm::vec3(0.0f)), m_axis(glm::vec3(0.0f, 1.0f, 0.0f)), m_degrees(0.0f), m_num_mats(0)
+    : m_name(name)
 {
     m_meshes.emplace_back(vertices, indices, material);
 }
 
 model::model(const std::string name, const base_mesh& mesh)
-    : m_scale(glm::vec3(1.0f)), m_position(glm::vec3(0.0f)), m_axis(glm::vec3(0.0f, 1.0f, 0.0f)), m_degrees(0.0f), m_num_mats(0)
+    : m_name(name)
 {
     m_meshes.push_back(mesh);
 }
@@ -57,7 +57,7 @@ glm::mat4 model::get_model_matrix() const {
 void model::draw(gl_shader_program& shader) {
 
     // Set model matrix
-    shader.set_uniform("model", this->get_model_matrix());
+    shader.set_uniform("modelMatrix", this->get_model_matrix());
 
     auto& meshes = this->get_meshes();
     for (auto& mesh : meshes) {
@@ -74,15 +74,13 @@ void model::destroy() {
 bool model::load_model(const std::string path, const bool flip_winding_order, const bool load_material = true) {
 
     std::string new_path = resource_manager::get_instance().get_assets_path() + path;
+
 #ifdef _DEBUG
     std::cout << "Loading model: " << m_name << '\n';
 #endif
 
-    std::cout << sizeof(pbr_material) << '\n';
-
     Assimp::Importer importer;
     const aiScene* scene = nullptr;
-
     if (flip_winding_order) {
         scene = importer.ReadFile(new_path, aiProcess_Triangulate |
                                   aiProcess_JoinIdenticalVertices |

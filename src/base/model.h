@@ -42,13 +42,15 @@ class model {
         void process_node(aiNode* node, const aiScene* scene, const bool load_material);
         base_mesh process_mesh(aiMesh* mesh, const aiScene* scene, const bool load_material);
 
-        glm::vec3 m_scale, m_position, m_axis;
-        float m_degrees;
+        glm::vec3 m_scale = glm::vec3(1.0f);
+        glm::vec3 m_position = glm::vec3(0.0f);
+        glm::vec3 m_axis = glm::vec3(0.0f, 1.0f, 0.0f);
+        float m_degrees = 0.0f;
 
         const std::string m_name;
         std::string m_path;
 
-        std::size_t m_num_mats;
+        std::size_t m_num_mats = 0;
 };
 
 #endif

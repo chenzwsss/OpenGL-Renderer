@@ -1,15 +1,23 @@
 #include "base_mesh.h"
 
-base_mesh::base_mesh(const std::vector<vertex>& vertices, const std::vector<GLuint>& indices) : index_count(indices.size()) {
+#include <iostream>
 
+base_mesh::base_mesh(const std::vector<vertex>& vertices, const std::vector<GLuint>& indices)
+	: index_count(indices.size())
+{
 	setup_mesh(vertices, indices);
+	set_uniform_buffer();
 }
 
-base_mesh::base_mesh(const std::vector<vertex>& vertices, const std::vector<GLuint>& indices, const pbr_material_ptr& material) :
-	index_count(indices.size()),
-	material(material) {
-
+base_mesh::base_mesh(const std::vector<vertex>& vertices, const std::vector<GLuint>& indices, const pbr_material_ptr& material)
+	: index_count(indices.size()), material(material)
+{
 	setup_mesh(vertices, indices);
+	set_uniform_buffer();
+}
+
+void base_mesh::set_uniform_buffer() {
+	
 }
 
 void base_mesh::draw(gl_shader_program& shader) {
@@ -23,7 +31,13 @@ void base_mesh::draw(gl_shader_program& shader) {
 	glBindTexture(GL_TEXTURE_2D, this->material->get_parameter_texture(pbr_material::ROUGHNESS));*/
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, this->material->get_parameter_texture(pbr_material::ALBEDO));
+	glBindTexture(GL_TEXTURE_2D, material->get_parameter_texture(pbr_material::ALBEDO));
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, this->material->get_parameter_texture(pbr_material::NORMAL));
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, this->material->get_parameter_texture(pbr_material::METALLIC));
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, this->material->get_parameter_texture(pbr_material::ROUGHNESS));
 
 	this->vao.bind();
 	glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(this->index_count), GL_UNSIGNED_INT, nullptr);
