@@ -58,10 +58,14 @@ unsigned int resource_manager::load_texture(std::string path, const bool useMipM
 
 unsigned int resource_manager::load_hdr_i(const std::string path) const {
 
+    stbi_set_flip_vertically_on_load(true);
+
     std::string new_path = get_assets_path() + path;
 
     int width, height, nrComp;
     auto* data{ stbi_loadf(new_path.data(), &width, &height, &nrComp, 0) };
+
+    stbi_set_flip_vertically_on_load(false);
 
     if (!data) {
         std::cerr << "Resource Manager: Failed to load HDRI." << std::endl;
@@ -96,4 +100,40 @@ std::string resource_manager::load_text_file(const std::string path) const {
     }
 
     return std::string(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
+}
+
+unsigned int resource_manager::texture_from_buffer(void* buffer, std::string name, int width, int height, int nrComponents, const bool useMipMaps) {
+    if (!buffer) {
+        std::cerr << "Resource Manager: Create texture error: " + name << " " << errno << std::endl;
+        return 0;
+    }
+
+    GLenum format = 0;
+    switch (nrComponents) {
+    case 1:
+        format = GL_RED;
+        break;
+    case 3:
+        format = GL_RGB;
+        break;
+    case 4:
+        format = GL_RGBA;
+        break;
+    }
+
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, buffer);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    if (useMipMaps)
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+    return textureID;
 }

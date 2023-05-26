@@ -15,13 +15,14 @@
 #include <iostream>
 
 #include "base/render_camera.hpp"
-#include "base/model.h"
 #include "utility/resource_manager.h"
 #include "graphic/gl_shader_program.h"
 
 #include "base/skybox.h"
 
 #include "utility/imgui_renderer.h"
+
+#include "base/gltf_model.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -104,7 +105,7 @@ int main() {
     imgui_renderer::get_instance().setup_imgui(window);
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
-    stbi_set_flip_vertically_on_load(true);
+    // stbi_set_flip_vertically_on_load(true);
 
     // configure global opengl state
     // -----------------------------
@@ -126,36 +127,40 @@ int main() {
     camera.type = render_camera::camera_type::lookat;
     camera.set_perspective(45.0f, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 256.0f);
     camera.rotation_speed = 0.1f;
-    camera.movement_speed = 0.5f;
-    camera.set_position({ 0.0f, 0.0f, -5.0f });
+    camera.movement_speed = 0.1f;
+    camera.set_position({ 0.0f, 0.0f, -3.0f });
     camera.set_rotation({ 0.0f, 0.0f, 0.0f });
 
-    // shaders
-    gl_shader_program pbr_shader{"PBR Shader", {
-        {"shaders/pbr_vs.glsl", "vertex"},
+    // shader program
+    gl_shader_program gltf_shader("glTF Shader", {
+        {"shaders/mesh_vert.glsl", "vertex"},
         {"shaders/wireframe_gs.glsl", "geometry"},
-        {"shaders/pbr_ps.glsl", "fragment"}
-    }};
+        {"shaders/mesh_frag.glsl", "fragment"}
+    });
+    gltf_shader.bind();
+    gltf_shader.set_uniform_i("albedoMap", 0);
 
     gl_shader_program skybox_shader{"Skybox Shader", {
         {"shaders/skybox_vs.glsl", "vertex"},
         {"shaders/skybox_ps.glsl", "fragment"}
     }};
 
-    pbr_shader.bind();
-    pbr_shader.set_uniform_i("irradianceMap", 0);
-    pbr_shader.set_uniform_i("prefilterMap", 1);
-    pbr_shader.set_uniform_i("brdfLUT", 2);
-    pbr_shader.set_uniform_i("albedoMap", 3);
-    pbr_shader.set_uniform_i("normalMap", 4);
-    pbr_shader.set_uniform_i("metallicMap", 5);
-    pbr_shader.set_uniform_i("roughnessMap", 6);
+    // pbr_shader.bind();
+    // pbr_shader.set_uniform_i("irradianceMap", 0);
+    // pbr_shader.set_uniform_i("prefilterMap", 1);
+    // pbr_shader.set_uniform_i("brdfLUT", 2);
+    // pbr_shader.set_uniform_i("albedoMap", 3);
+    // pbr_shader.set_uniform_i("normalMap", 4);
+    // pbr_shader.set_uniform_i("metallicMap", 5);
+    // pbr_shader.set_uniform_i("roughnessMap", 6);
 
     skybox_shader.bind();
     skybox_shader.set_uniform_i("environmentMap", 0);
 
     // model
-    model model_nanosuit("models/nanosuit/nanosuit.obj", "nanosuit");
+    // model model_nanosuit("data/nanosuit/nanosuit.obj", "nanosuit");
+
+    gltf_model g_m("models/DamagedHelmet/glTF-Embedded/DamagedHelmet.gltf");
 
     // skybox
     skybox env_skybox;
@@ -174,14 +179,14 @@ int main() {
     glViewport(0, 0, scr_width, scr_height);
 
     // set light direction
-    glm::vec4 lightDir = glm::vec4(
-        sin(glm::radians(lightSource.rotation.x)) * cos(glm::radians(lightSource.rotation.y)),
-        sin(glm::radians(lightSource.rotation.y)),
-        cos(glm::radians(lightSource.rotation.x)) * cos(glm::radians(lightSource.rotation.y)),
-        0.0f);
-    pbr_shader.bind();
-    pbr_shader.set_uniform("lightDir", lightDir);
-    pbr_shader.set_uniform("lightColor", lightSource.color);
+    // glm::vec4 lightDir = glm::vec4(
+    //     sin(glm::radians(lightSource.rotation.x)) * cos(glm::radians(lightSource.rotation.y)),
+    //     sin(glm::radians(lightSource.rotation.y)),
+    //     cos(glm::radians(lightSource.rotation.x)) * cos(glm::radians(lightSource.rotation.y)),
+    //     0.0f);
+    // pbr_shader.bind();
+    // pbr_shader.set_uniform("lightDir", lightDir);
+    // pbr_shader.set_uniform("lightColor", lightSource.color);
 
     // render loop
     // -----------
@@ -218,22 +223,24 @@ int main() {
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, env_skybox.get_brdf_lut());
 
-        glm::vec3 camPos = glm::vec3(
+       /* glm::vec3 camPos = glm::vec3(
             camera.position.z * sin(glm::radians(camera.rotation.y)) * cos(glm::radians(camera.rotation.x)),
             -camera.position.z * sin(glm::radians(camera.rotation.x)),
             -camera.position.z * cos(glm::radians(camera.rotation.y)) * cos(glm::radians(camera.rotation.x))
-        );
+        );*/
 
-        pbr_shader.bind();
-        pbr_shader.set_uniform("camPos", camPos);
-
-        // set uniform render wireframe
-        pbr_shader.set_uniform_i("render_wireframe", (int)imgui_renderer::render_wireframe);
-
-        // model
-        model_nanosuit.translate(glm::vec3(0.0f, -7.0f, 1.0f));
-        model_nanosuit.scale(glm::vec3(0.8f));
-        model_nanosuit.draw(pbr_shader);
+        // pbr_shader.bind();
+        // // set camera postion
+        // pbr_shader.set_uniform("camPos", camPos);
+        // // set uniform render wireframe
+        // pbr_shader.set_uniform_i("render_wireframe", (int)imgui_renderer::render_wireframe);
+        // render model
+        // model_nanosuit.translate(glm::vec3(0.0f, -7.0f, 1.0f));
+        // model_nanosuit.scale(glm::vec3(0.8f));
+        // model_nanosuit.draw(pbr_shader);
+        gltf_shader.bind();
+        gltf_shader.set_uniform_i("render_wireframe", (int)imgui_renderer::render_wireframe);
+        g_m.draw(gltf_shader);
 
         // render skybox (render as last to prevent overdraw)
         skybox_shader.bind();

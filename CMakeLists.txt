@@ -4,30 +4,6 @@ set(PROJECT_NAME opengl_renderer)
 
 project (${PROJECT_NAME})
 
-# target_include_directories(${PROJECT_NAME}
-#     PRIVATE
-#         ${PROJECT_SOURCE_DIR}/include
-#         ${PROJECT_SOURCE_DIR}/include/src
-#         ${PROJECT_SOURCE_DIR}/external/glad/include
-#         ${PROJECT_SOURCE_DIR}/external/glfw/include
-#         ${PROJECT_SOURCE_DIR}/external/glm
-#         ${PROJECT_SOURCE_DIR}/external/stb
-#         ${PROJECT_SOURCE_DIR}/external/imgui
-#         ${PROJECT_SOURCE_DIR}/external/assimp/include
-# )
-
-include_directories(src)
-include_directories(external/glad/include)
-include_directories(external/glfw/include)
-include_directories(external/glm)
-include_directories(external/stb)
-include_directories(external/imgui)
-include_directories(external/assimp/include)
-
-set(CMAKE_CXX_STANDARD 17) # this does nothing for MSVC, use target_compile_options below
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS ON)
-
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build(Debug or Release)" FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
@@ -68,15 +44,13 @@ set(SOURCES
     src/utility/resource_manager.cpp
     src/utility/imgui_renderer.h
     src/utility/imgui_renderer.cpp
-    src/base/vertex.h
+    src/base/Vertex.h
     src/base/skybox.h
     src/base/skybox.cpp
-    src/base/base_mesh.h
-    src/base/base_mesh.cpp
-    src/base/model.h
-    src/base/model.cpp
-    src/base/pbr_material.h
-    src/base/pbr_material.cpp
+    src/base/gltf_model.h
+    src/base/gltf_model.cpp
+    src/base/gltfMesh.h
+    src/base/gltfMesh.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -96,17 +70,38 @@ set(LIBS ${LIBS} glm)
 add_subdirectory(external/imgui)
 set(LIBS ${LIBS} imgui)
 
-# stb_image
-add_library(stb_image ${PROJECT_SOURCE_DIR}/external/stb/stb_image.cpp)
-set(LIBS ${LIBS} stb_image)
+# # stb_image
+# add_library(stb_image ${PROJECT_SOURCE_DIR}/external/stb/stb_image.cpp)
+# set(LIBS ${LIBS} stb_image)
 
-# assimp
-set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(ASSIMP_WARNINGS_AS_ERRORS  OFF CACHE BOOL "" FORCE)
-set(ASSIMP_INJECT_DEBUG_POSTFIX  OFF CACHE BOOL "" FORCE)
-set(ASSIMP_INSTALL_PDB OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_ASSIMP_VIEW  OFF CACHE BOOL "" FORCE)
-add_subdirectory(external/assimp)
-set(LIBS ${LIBS} assimp)
+# # assimp
+# set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+# set(ASSIMP_WARNINGS_AS_ERRORS  OFF CACHE BOOL "" FORCE)
+# set(ASSIMP_INJECT_DEBUG_POSTFIX  OFF CACHE BOOL "" FORCE)
+# set(ASSIMP_INSTALL_PDB OFF CACHE BOOL "" FORCE)
+# set(ASSIMP_BUILD_ASSIMP_VIEW  OFF CACHE BOOL "" FORCE)
+# add_subdirectory(external/assimp)
+# set(LIBS ${LIBS} assimp)
+
+# tinygltf
+set(TINYGLTF_BUILD_LOADER_EXAMPLE OFF CACHE BOOL "" FORCE)
+set(TINYGLTF_BUILD_GL_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(TINYGLTF_BUILD_VALIDATOR_EXAMPLE OFF CACHE BOOL "" FORCE)
+set(TINYGLTF_BUILD_BUILDER_EXAMPLE OFF CACHE BOOL "" FORCE)
+add_subdirectory(external/tinygltf)
+set(LIBS ${LIBS} tinygltf)
 
 target_link_libraries(${PROJECT_NAME} ${LIBS})
+
+include_directories(src)
+include_directories(external/glad/include)
+include_directories(external/glfw/include)
+include_directories(external/glm)
+include_directories(external/stb)
+include_directories(external/imgui)
+include_directories(external/assimp/include)
+include_directories(external/tinygltf)
+
+set(CMAKE_CXX_STANDARD 17) # this does nothing for MSVC, use target_compile_options below
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
