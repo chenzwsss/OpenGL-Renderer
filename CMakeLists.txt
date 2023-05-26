@@ -70,19 +70,6 @@ set(LIBS ${LIBS} glm)
 add_subdirectory(external/imgui)
 set(LIBS ${LIBS} imgui)
 
-# # stb_image
-# add_library(stb_image ${PROJECT_SOURCE_DIR}/external/stb/stb_image.cpp)
-# set(LIBS ${LIBS} stb_image)
-
-# # assimp
-# set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-# set(ASSIMP_WARNINGS_AS_ERRORS  OFF CACHE BOOL "" FORCE)
-# set(ASSIMP_INJECT_DEBUG_POSTFIX  OFF CACHE BOOL "" FORCE)
-# set(ASSIMP_INSTALL_PDB OFF CACHE BOOL "" FORCE)
-# set(ASSIMP_BUILD_ASSIMP_VIEW  OFF CACHE BOOL "" FORCE)
-# add_subdirectory(external/assimp)
-# set(LIBS ${LIBS} assimp)
-
 # tinygltf
 set(TINYGLTF_BUILD_LOADER_EXAMPLE OFF CACHE BOOL "" FORCE)
 set(TINYGLTF_BUILD_GL_EXAMPLES OFF CACHE BOOL "" FORCE)
