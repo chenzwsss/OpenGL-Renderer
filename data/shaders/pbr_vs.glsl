@@ -11,15 +11,17 @@ layout (std140, binding = 0) uniform Matrices {
 
 uniform mat4 modelMatrix;
 
-out vec3 vWorldPos;
-out vec3 vNormal;
-out vec2 vTexCoords;
+out VertexData {
+    out vec3 vWorldPos;
+    out vec3 vNormal;
+    out vec2 vTexCoords;
+} vertexData;
 
 void main() {
-    vTexCoords = aTexCoords;
+    vertexData.vTexCoords = aTexCoords;
 
-    vWorldPos = vec3(modelMatrix * vec4(aPosition, 1.0));
-    vNormal = mat3(modelMatrix) * aNormal;
+    vertexData.vWorldPos = vec3(modelMatrix * vec4(aPosition, 1.0));
+    vertexData.vNormal = mat3(modelMatrix) * aNormal;
 
-    gl_Position = projection * view * vec4(vWorldPos, 1.0);
+    gl_Position = projection * view * vec4(vertexData.vWorldPos, 1.0);
 }

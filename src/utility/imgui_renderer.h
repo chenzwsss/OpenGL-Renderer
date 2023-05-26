@@ -15,6 +15,8 @@ class imgui_renderer {
         void setup_imgui(GLFWwindow* window);
         void render_imgui();
         void destroy_imgui();
+
+        static bool render_wireframe;
 };
 
 #endif

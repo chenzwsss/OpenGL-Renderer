@@ -1,5 +1,7 @@
 #include "imgui_renderer.h"
 
+bool imgui_renderer::render_wireframe = false;
+
 void imgui_renderer::setup_imgui(GLFWwindow* window) {
     // Setup Dear ImGui content
     IMGUI_CHECKVERSION();
@@ -18,11 +20,18 @@ void imgui_renderer::render_imgui() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
     {
-        ImGui::Begin("opengl status");
+        ImGui::Begin("Opengl Renderer");
         ImGuiIO& io = ImGui::GetIO();
-        ImGui::Text("%.1f FPS(%.3f ms/frame)", io.Framerate, 1000.0f / io.Framerate);
+        ImGui::Text("%.3f ms/frame (%d fps)", 1000.0f / io.Framerate, static_cast<int>(io.Framerate));
+
+        if (ImGui::CollapsingHeader("Settings"))
+        {
+            ImGui::Checkbox("Wireframe", &render_wireframe);
+        }
+
         ImGui::End();
     }
+
     ImGui::Render();
     // ImGui draw
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

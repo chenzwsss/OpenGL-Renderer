@@ -51,15 +51,6 @@ const std::string WINDOW_NAME = "opengl_renderer";
 
 GLuint m_uboMatrices{ 0 };
 
-//struct MaterialData {
-//    float metallic_factor;
-//    float roughness_factor;
-//    int normal_texture_set;
-//    int metallic_texture_set;
-//    int roughness_texture_set;
-//} materialData;
-//GLuint m_materialData{ 0 };
-
 struct {
     bool left = false;
     bool right = false;
@@ -70,6 +61,11 @@ struct LightSource {
     glm::vec3 color = glm::vec3(1.0f);
     glm::vec3 rotation = glm::vec3(75.0f, 40.0f, 0.0f);
 } lightSource;
+
+struct HardwareCaps {
+    float MaxAnisotropy;
+    int TotalVideoMemoryKB;
+} hardwareCaps;
 
 int main() {
     // glfw: initialize and configure
@@ -137,6 +133,7 @@ int main() {
     // shaders
     gl_shader_program pbr_shader{"PBR Shader", {
         {"shaders/pbr_vs.glsl", "vertex"},
+        {"shaders/wireframe_gs.glsl", "geometry"},
         {"shaders/pbr_ps.glsl", "fragment"}
     }};
 
@@ -229,6 +226,9 @@ int main() {
 
         pbr_shader.bind();
         pbr_shader.set_uniform("camPos", camPos);
+
+        // set uniform render wireframe
+        pbr_shader.set_uniform_i("render_wireframe", (int)imgui_renderer::render_wireframe);
 
         // model
         model_nanosuit.translate(glm::vec3(0.0f, -7.0f, 1.0f));

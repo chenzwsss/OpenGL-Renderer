@@ -8,8 +8,7 @@
 const std::unordered_map<std::string, int> GL_SHADER_TYPE_ENUM {
     { "vertex", GL_VERTEX_SHADER },
     { "fragment", GL_FRAGMENT_SHADER },
-    { "geometry", GL_GEOMETRY_SHADER },
-    { "compute", GL_COMPUTE_SHADER }
+    { "geometry", GL_GEOMETRY_SHADER }
 };
 
 void scan_for_includes(std::string& shader_code) {

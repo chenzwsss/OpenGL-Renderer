@@ -10,9 +10,13 @@ layout (std140, binding = 1) uniform MaterialParams {
     int roughness_texture_set;
 };
 
-in vec3 vWorldPos;
-in vec3 vNormal;
-in vec2 vTexCoords;
+in FragData {
+    vec3 vWorldPos;
+    vec3 vNormal;
+    vec2 vTexCoords;
+    // Noperspective so the interpolation is in screen-space
+    noperspective vec3 wireframeDist;
+} fragData;
 
 // IBL
 uniform samplerCube irradianceMap;
@@ -28,36 +32,40 @@ uniform vec4 lightDir;
 uniform vec3 lightColor;
 uniform vec3 camPos;
 
+uniform int render_wireframe;
+
 const float M_PI = 3.14159265359;
 
 #include "shaders/pbr_functions.glsl"
 
 void main() {
 
-    vec3 albedo = pow(texture(albedoMap, vTexCoords).rgb, vec3(2.2)); // sRGB need to gamma correction
+    vec2 uv = fragData.vTexCoords;
+
+    vec3 albedo = pow(texture(albedoMap, uv).rgb, vec3(2.2)); // sRGB need to gamma correction
 
     vec3 n;
     if (normal_texture_set > 0) {
-        n = getNormalFromMap();   
+        n = getNormalFromMap(fragData.vWorldPos, fragData.vNormal, uv);   
     } else {
-        n = vNormal;
+        n = fragData.vNormal;
     }
 
     float metallic;
     if (metallic_texture_set > 0) {
-        metallic = texture(metallicMap, vTexCoords).r * metallic_factor;
+        metallic = texture(metallicMap, uv).r * metallic_factor;
     } else {
         metallic = metallic_factor;
     }
 
     float roughness;
     if (roughness_texture_set > 0) {
-        roughness = texture(roughnessMap, vTexCoords).r * roughness_factor;
+        roughness = texture(roughnessMap, uv).r * roughness_factor;
     } else {
         roughness = roughness_factor;
     }
 
-    vec3 v = normalize(camPos - vWorldPos);
+    vec3 v = normalize(camPos - fragData.vWorldPos);
     vec3 l = normalize(lightDir.xyz);
     vec3 h = normalize(v + l);
 
@@ -104,6 +112,14 @@ void main() {
     vec3 ambient = kd * diffuse + specular;
 
     vec3 color = Lo + ambient;
+
+    // Wireframe
+    if (render_wireframe > 0) {
+        vec3 d = fwidth(fragData.wireframeDist);
+        vec3 a3 = smoothstep(vec3(0.0), d * 1.5, fragData.wireframeDist);
+        float edgeFactor = min(min(a3.x, a3.y), a3.z);
+        color = mix(vec3(1.0), color.rgb, vec3(edgeFactor));
+    }
 
     FragColor = vec4(pow(vec3(color), vec3(1.0 / 2.2)), 1.0);
 }
