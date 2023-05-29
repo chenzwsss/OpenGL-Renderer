@@ -101,8 +101,8 @@ void Skybox::init(const std::string hdr_path, const GLsizei resolution) {
     };
 
     GLShaderProgram convertToCubemapShader{ "Equirectangular to Cubemap Shader", {
-        {"shaders/cubemap_vs.glsl", "vertex"},
-        {"shaders/cubemapconverter_ps.glsl", "fragment"}
+        {"shaders/glsl/cubemap.vert", "vertex"},
+        {"shaders/glsl/cubemapConverter.frag", "fragment"}
     } };
 
     convertToCubemapShader.bind();
@@ -151,8 +151,8 @@ void Skybox::init(const std::string hdr_path, const GLsizei resolution) {
 
     // Solve diffuse integral by convolution to create an irradiance cubemap
     GLShaderProgram irradianceShader{"Irradiance Shader", {
-        {"shaders/cubemap_vs.glsl", "vertex"},
-        {"shaders/irradianceConvolution_ps.glsl", "fragment"}
+        {"shaders/glsl/cubemap.vert", "vertex"},
+        {"shaders/glsl/irradianceConvolution.frag", "fragment"}
     }};
 
     irradianceShader.bind();
@@ -191,8 +191,8 @@ void Skybox::init(const std::string hdr_path, const GLsizei resolution) {
     // Run quasi monte-carlo simulation on the environment lighting to create a prefilter cubemap (since we can't integrate over infinite directions).
     // Pre-filter the environment map with different roughness values over multiple mipmap levels
     GLShaderProgram prefilterShader{"Pre-filter Shader", {
-        {"shaders/cubemap_vs.glsl", "vertex"},
-        {"shaders/prefilter_ps.glsl", "fragment"}
+        {"shaders/glsl/cubemap.vert", "vertex"},
+        {"shaders/glsl/prefilter.frag", "fragment"}
     }};
 
     prefilterShader.bind();
@@ -242,8 +242,8 @@ void Skybox::init(const std::string hdr_path, const GLsizei resolution) {
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_brdf_lut, 0);
 
     GLShaderProgram brdfShader{"BRDF Shader", {
-        {"shaders/brdf_vs.glsl", "vertex"},
-        {"shaders/brdf_ps.glsl", "fragment"}
+        {"shaders/glsl/brdf.vert", "vertex"},
+        {"shaders/glsl/brdf.frag", "fragment"}
     }};
 
     brdfShader.bind();

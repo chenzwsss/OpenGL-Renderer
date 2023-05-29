@@ -128,16 +128,16 @@ int main() {
 
     // shader program
     GLShaderProgram gltf_shader("glTF Shader", {
-        {"shaders/mesh_vert.glsl", "vertex"},
-        {"shaders/wireframe_gs.glsl", "geometry"},
-        {"shaders/mesh_frag.glsl", "fragment"}
+        {"shaders/glsl/mesh.vert", "vertex"},
+        {"shaders/glsl/wireframe.geometry", "geometry"},
+        {"shaders/glsl/mesh.frag", "fragment"}
     });
     gltf_shader.bind();
     gltf_shader.set_uniform_i("albedoMap", 0);
 
     GLShaderProgram skybox_shader{"Skybox Shader", {
-        {"shaders/skybox_vs.glsl", "vertex"},
-        {"shaders/skybox_ps.glsl", "fragment"}
+        {"shaders/glsl/skybox.vert", "vertex"},
+        {"shaders/glsl/skybox.frag", "fragment"}
     }};
 
     // pbr_shader.bind();
