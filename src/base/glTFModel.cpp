@@ -237,7 +237,7 @@ void glTFModel::loadNode(const tinygltf::Node& input_node, const tinygltf::Model
                 }
             }
 
-            gltfMesh primitive(vertices, indices, glTFPrimitive.material);
+            glTFMesh primitive(vertices, indices, glTFPrimitive.material);
             node->mesh.primitives.push_back(primitive);
         }
     }

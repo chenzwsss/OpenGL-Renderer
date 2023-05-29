@@ -50,8 +50,8 @@ set(SOURCES
     src/base/Skybox.cpp
     src/base/glTFModel.h
     src/base/glTFModel.cpp
-    src/base/gltfMesh.h
-    src/base/gltfMesh.cpp
+    src/base/glTFMesh.h
+    src/base/glTFMesh.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

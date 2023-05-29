@@ -8,7 +8,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "gltfMesh.h"
+#include "glTFMesh.h"
 
 #include "../graphic/gl_shader_program.h"
 
@@ -16,7 +16,7 @@ class glTFModel {
     public:
         // Contains the node's (optional) geometry and can be made up of an arbitrary number of primitives
         struct Mesh {
-            std::vector<gltfMesh> primitives;
+            std::vector<glTFMesh> primitives;
         };
 
         struct Image {

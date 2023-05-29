@@ -1,11 +1,11 @@
-#include "gltfMesh.h"
+#include "glTFMesh.h"
 
-gltfMesh::gltfMesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices, int32_t materialIndex)
+glTFMesh::glTFMesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices, int32_t materialIndex)
 : m_materialIndex(materialIndex), m_indexCount(indices.size()) {
     setupMesh(vertices, indices);
 }
 
-void gltfMesh::setupMesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
+void glTFMesh::setupMesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices) {
     m_VAO.init();
     m_VAO.bind();
     // Attach VBO
@@ -23,7 +23,7 @@ void gltfMesh::setupMesh(const std::vector<Vertex>& vertices, const std::vector<
     m_VAO.enable_attribute(2, 2, vertex_size, reinterpret_cast<void*>(offsetof(Vertex, TexCoords)));
 }
 
-void gltfMesh::draw() {
+void glTFMesh::draw() {
     m_VAO.bind();
     glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indexCount), GL_UNSIGNED_INT, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);

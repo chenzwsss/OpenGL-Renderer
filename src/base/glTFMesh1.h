@@ -7,9 +7,9 @@
 
 #include <vector>
 
-class gltfMesh {
+class glTFMesh {
     public:
-        gltfMesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices, int32_t materialIndex);
+        glTFMesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices, int32_t materialIndex);
 
         void setupMesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices);
 
