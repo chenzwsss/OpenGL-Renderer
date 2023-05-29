@@ -1,4 +1,4 @@
-#include "resource_manager.h"
+#include "ResourceManager.h"
 
 #include <iostream>
 #include <sstream>
@@ -8,7 +8,7 @@
 
 #include <stb_image.h>
 
-unsigned int resource_manager::load_texture(std::string path, const bool useMipMaps) const {
+unsigned int ResourceManager::load_texture(std::string path, const bool useMipMaps) const {
     if (path.empty())
         return 0;
 
@@ -56,7 +56,7 @@ unsigned int resource_manager::load_texture(std::string path, const bool useMipM
     return textureID;
 }
 
-unsigned int resource_manager::load_hdr_i(const std::string path) const {
+unsigned int ResourceManager::load_hdr_i(const std::string path) const {
 
     stbi_set_flip_vertically_on_load(true);
 
@@ -87,7 +87,7 @@ unsigned int resource_manager::load_hdr_i(const std::string path) const {
     return hdrTexture;
 }
 
-std::string resource_manager::load_text_file(const std::string path) const {
+std::string ResourceManager::load_text_file(const std::string path) const {
 
     std::string new_path = get_assets_path() + path;
 
@@ -102,7 +102,7 @@ std::string resource_manager::load_text_file(const std::string path) const {
     return std::string(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
 }
 
-unsigned int resource_manager::texture_from_buffer(void* buffer, std::string name, int width, int height, int nrComponents, const bool useMipMaps) {
+unsigned int ResourceManager::texture_from_buffer(void* buffer, std::string name, int width, int height, int nrComponents, const bool useMipMaps) {
     if (!buffer) {
         std::cerr << "Resource Manager: Create texture error: " + name << " " << errno << std::endl;
         return 0;

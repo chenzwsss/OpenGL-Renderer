@@ -1,9 +1,9 @@
-#include "gl_shader_program.h"
+#include "GLShaderProgram.h"
 
 #include <iostream>
 #include <unordered_map>
 
-#include "../utility/resource_manager.h"
+#include "../utility/ResourceManager.h"
 
 const std::unordered_map<std::string, int> GL_SHADER_TYPE_ENUM {
     { "vertex", GL_VERTEX_SHADER },
@@ -23,7 +23,7 @@ void scan_for_includes(std::string& shader_code) {
         const auto path_to_included_file = shader_code.substr(pos, length - pos);
 
         // Load included file
-        const auto included_file = resource_manager::get_instance().load_text_file(path_to_included_file) + "\n";
+        const auto included_file = ResourceManager::get_instance().load_text_file(path_to_included_file) + "\n";
         // Insert into shader code
         shader_code.replace(start_pos, (length + 1) - start_pos, included_file);
         
@@ -37,7 +37,7 @@ void compile(const GLuint id, const GLchar* shader_code) {
     glCompileShader(id);
 }
 
-bool compile_stage(const GLuint id, const shader_create_info info, const std::string& shader_code) {
+bool compile_stage(const GLuint id, const ShaderCreateInfo info, const std::string& shader_code) {
     GLint success{ GL_FALSE };
 
     compile(id, shader_code.c_str());
@@ -73,7 +73,7 @@ bool link_program(const GLuint id) {
     return success == GL_TRUE;
 }
 
-gl_shader_program::gl_shader_program(const std::string program_name, const std::vector<shader_create_info> stages)
+GLShaderProgram::GLShaderProgram(const std::string program_name, const std::vector<ShaderCreateInfo> stages)
     : m_program_name(program_name) {
 
 #ifdef _DEBUG
@@ -87,7 +87,7 @@ gl_shader_program::gl_shader_program(const std::string program_name, const std::
         auto id{ glCreateShader(GL_SHADER_TYPE_ENUM.at(stages[i].type)) };
         shader_ids.push_back(id);
 
-        auto shader_code{ resource_manager::get_instance().load_text_file(stages[i].file_path) };
+        auto shader_code{ ResourceManager::get_instance().load_text_file(stages[i].file_path) };
         scan_for_includes(shader_code);
 
         if (!compile_stage(id, stages[i], shader_code)) {
@@ -121,17 +121,17 @@ gl_shader_program::gl_shader_program(const std::string program_name, const std::
     }
 }
 
-gl_shader_program::~gl_shader_program() {
+GLShaderProgram::~GLShaderProgram() {
     delete_program();
 }
 
-void gl_shader_program::bind() const {
+void GLShaderProgram::bind() const {
     assert(m_program_id != 0);
 
     glUseProgram(m_program_id);
 }
 
-void gl_shader_program::delete_program() const {
+void GLShaderProgram::delete_program() const {
     if (m_program_id != 0) {
 
 #ifdef _DEBUG
@@ -141,38 +141,38 @@ void gl_shader_program::delete_program() const {
     }
 }
 
-void gl_shader_program::set_uniform_i(const std::string& uniform_name, const int value) {
+void GLShaderProgram::set_uniform_i(const std::string& uniform_name, const int value) {
     glUniform1i(get_uniform_location(uniform_name), value);
 }
 
-void gl_shader_program::set_uniform_f(const std::string& uniform_name, const float value) {
+void GLShaderProgram::set_uniform_f(const std::string& uniform_name, const float value) {
     glUniform1f(get_uniform_location(uniform_name), value);
 }
 
-void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::ivec2& value) {
+void GLShaderProgram::set_uniform(const std::string& uniform_name, const glm::ivec2& value) {
     glUniform2iv(get_uniform_location(uniform_name), 1, &value[0]);
 }
 
-void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::vec2& value) {
+void GLShaderProgram::set_uniform(const std::string& uniform_name, const glm::vec2& value) {
     glUniform2f(get_uniform_location(uniform_name), value.x, value.y);
 }
 
-void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::vec3& value) {
+void GLShaderProgram::set_uniform(const std::string& uniform_name, const glm::vec3& value) {
     glUniform3f(get_uniform_location(uniform_name), value.x, value.y, value.z);
 }
 
-void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::vec4& value) {
+void GLShaderProgram::set_uniform(const std::string& uniform_name, const glm::vec4& value) {
     glUniform4f(get_uniform_location(uniform_name), value.x, value.y, value.z, value.w);
 }
 
-void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::mat3x3& value) {
+void GLShaderProgram::set_uniform(const std::string& uniform_name, const glm::mat3x3& value) {
     glUniformMatrix3fv(get_uniform_location(uniform_name), 1, GL_FALSE, value_ptr(value));
 }
 
-void gl_shader_program::set_uniform(const std::string& uniform_name, const glm::mat4x4& value) {
+void GLShaderProgram::set_uniform(const std::string& uniform_name, const glm::mat4x4& value) {
     glUniformMatrix4fv(get_uniform_location(uniform_name), 1, GL_FALSE, value_ptr(value));
 }
 
-GLuint gl_shader_program::get_uniform_location(const std::string& uniform_name) {
+GLuint GLShaderProgram::get_uniform_location(const std::string& uniform_name) {
     return glGetUniformLocation(m_program_id, uniform_name.c_str());
 }

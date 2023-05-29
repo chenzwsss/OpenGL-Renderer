@@ -9,12 +9,12 @@
 #include <unordered_map>
 #include <string>
 
-#include "shader_create_info.h"
+#include "ShaderCreateInfo.h"
 
-class gl_shader_program {
+class GLShaderProgram {
     public:
-        gl_shader_program(const std::string program_name, const std::vector<shader_create_info> stages);
-        ~gl_shader_program();
+        GLShaderProgram(const std::string program_name, const std::vector<ShaderCreateInfo> stages);
+        ~GLShaderProgram();
 
         void bind() const;
         void delete_program() const;

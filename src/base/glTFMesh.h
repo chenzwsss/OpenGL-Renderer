@@ -2,8 +2,8 @@
 #define GLTF_MESH_H
 
 #include "Vertex.h"
-#include "../graphic/gl_vertex_array.h"
-#include "../graphic/gl_shader_program.h"
+#include "../graphic/GLVertexArray.h"
+#include "../graphic/GLShaderProgram.h"
 
 #include <vector>
 
@@ -17,7 +17,7 @@ class glTFMesh {
 
         int32_t m_materialIndex;
         uint32_t m_indexCount;
-        gl_vertex_array m_VAO;
+        GLVertexArray m_VAO;
 };
 
 #endif

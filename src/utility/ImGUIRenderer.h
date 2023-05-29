@@ -5,10 +5,10 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-class imgui_renderer {
+class ImGUIRenderer {
     public:
         static auto& get_instance() {
-            static imgui_renderer instance;
+            static ImGUIRenderer instance;
             return instance;
         }
 

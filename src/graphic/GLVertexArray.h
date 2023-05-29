@@ -3,7 +3,7 @@
 
 #include <glad/glad.h>
 
-class gl_vertex_array {
+class GLVertexArray {
     public:
         enum buffer_type : int {
             ARRAY = GL_ARRAY_BUFFER,

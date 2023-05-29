@@ -4,8 +4,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "../utility/resource_manager.h"
-#include "../graphic/gl_shader_program.h"
+#include "../utility/ResourceManager.h"
+#include "../graphic/GLShaderProgram.h"
 
 const std::array<float, 108> vertices{
     // back face
@@ -76,7 +76,7 @@ void Skybox::init(const std::string hdr_path, const GLsizei resolution) {
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, resolution, resolution);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, envMapRBO);
 
-    const auto hdrTexture = resource_manager::get_instance().load_hdr_i(hdr_path);
+    const auto hdrTexture = ResourceManager::get_instance().load_hdr_i(hdr_path);
 
     glGenTextures(1, &m_env_cubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_env_cubemap);
@@ -100,7 +100,7 @@ void Skybox::init(const std::string hdr_path, const GLsizei resolution) {
         glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    gl_shader_program convertToCubemapShader{ "Equirectangular to Cubemap Shader", {
+    GLShaderProgram convertToCubemapShader{ "Equirectangular to Cubemap Shader", {
         {"shaders/cubemap_vs.glsl", "vertex"},
         {"shaders/cubemapconverter_ps.glsl", "fragment"}
     } };
@@ -150,7 +150,7 @@ void Skybox::init(const std::string hdr_path, const GLsizei resolution) {
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, resolution / 16, resolution / 16);
 
     // Solve diffuse integral by convolution to create an irradiance cubemap
-    gl_shader_program irradianceShader{"Irradiance Shader", {
+    GLShaderProgram irradianceShader{"Irradiance Shader", {
         {"shaders/cubemap_vs.glsl", "vertex"},
         {"shaders/irradianceConvolution_ps.glsl", "fragment"}
     }};
@@ -190,7 +190,7 @@ void Skybox::init(const std::string hdr_path, const GLsizei resolution) {
 
     // Run quasi monte-carlo simulation on the environment lighting to create a prefilter cubemap (since we can't integrate over infinite directions).
     // Pre-filter the environment map with different roughness values over multiple mipmap levels
-    gl_shader_program prefilterShader{"Pre-filter Shader", {
+    GLShaderProgram prefilterShader{"Pre-filter Shader", {
         {"shaders/cubemap_vs.glsl", "vertex"},
         {"shaders/prefilter_ps.glsl", "fragment"}
     }};
@@ -241,7 +241,7 @@ void Skybox::init(const std::string hdr_path, const GLsizei resolution) {
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, resolution, resolution);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_brdf_lut, 0);
 
-    gl_shader_program brdfShader{"BRDF Shader", {
+    GLShaderProgram brdfShader{"BRDF Shader", {
         {"shaders/brdf_vs.glsl", "vertex"},
         {"shaders/brdf_ps.glsl", "fragment"}
     }};

@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "../graphic/gl_vertex_array.h"
+#include "../graphic/GLVertexArray.h"
 
 class Skybox {
     public:
@@ -16,7 +16,7 @@ class Skybox {
     private:
         void render_cube();
         unsigned int m_cube_vao, m_env_cubemap, m_env_map_fbo, m_irradiance_map, m_prefilter_map, m_brdf_lut;
-        gl_vertex_array m_quad_vao;
+        GLVertexArray m_quad_vao;
 };
 
 #endif

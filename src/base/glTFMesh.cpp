@@ -1,7 +1,7 @@
 #include "glTFMesh.h"
 
 glTFMesh::glTFMesh(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices, int32_t materialIndex)
-: m_materialIndex(materialIndex), m_indexCount(indices.size()) {
+: m_materialIndex(materialIndex), m_indexCount(static_cast<uint32_t>(indices.size())) {
     setupMesh(vertices, indices);
 }
 
@@ -9,9 +9,9 @@ void glTFMesh::setupMesh(const std::vector<Vertex>& vertices, const std::vector<
     m_VAO.init();
     m_VAO.bind();
     // Attach VBO
-    m_VAO.attach_buffer(gl_vertex_array::buffer_type::ARRAY, vertices.size() * sizeof(Vertex), gl_vertex_array::draw_mode::STATIC, &vertices[0]);
+    m_VAO.attach_buffer(GLVertexArray::buffer_type::ARRAY, vertices.size() * sizeof(Vertex), GLVertexArray::draw_mode::STATIC, &vertices[0]);
     // Attach EBO
-    m_VAO.attach_buffer(gl_vertex_array::buffer_type::ELEMENT, indices.size() * sizeof(GLuint), gl_vertex_array::draw_mode::STATIC, &indices[0]);
+    m_VAO.attach_buffer(GLVertexArray::buffer_type::ELEMENT, indices.size() * sizeof(GLuint), GLVertexArray::draw_mode::STATIC, &indices[0]);
 
     // Vertex Attributes
     const static auto vertex_size = sizeof(Vertex);

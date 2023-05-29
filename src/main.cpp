@@ -15,12 +15,12 @@
 #include <iostream>
 
 #include "base/RenderCamera.hpp"
-#include "utility/resource_manager.h"
-#include "graphic/gl_shader_program.h"
+#include "utility/ResourceManager.h"
+#include "graphic/GLShaderProgram.h"
 
 #include "base/Skybox.h"
 
-#include "utility/imgui_renderer.h"
+#include "utility/ImGUIRenderer.h"
 
 #include "base/glTFModel.h"
 
@@ -97,7 +97,7 @@ int main() {
     }
 
     // initial ImGui
-    imgui_renderer::get_instance().setup_imgui(window);
+    ImGUIRenderer::get_instance().setup_imgui(window);
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
     // stbi_set_flip_vertically_on_load(true);
@@ -127,7 +127,7 @@ int main() {
     camera.set_rotation({ 0.0f, 0.0f, 0.0f });
 
     // shader program
-    gl_shader_program gltf_shader("glTF Shader", {
+    GLShaderProgram gltf_shader("glTF Shader", {
         {"shaders/mesh_vert.glsl", "vertex"},
         {"shaders/wireframe_gs.glsl", "geometry"},
         {"shaders/mesh_frag.glsl", "fragment"}
@@ -135,7 +135,7 @@ int main() {
     gltf_shader.bind();
     gltf_shader.set_uniform_i("albedoMap", 0);
 
-    gl_shader_program skybox_shader{"Skybox Shader", {
+    GLShaderProgram skybox_shader{"Skybox Shader", {
         {"shaders/skybox_vs.glsl", "vertex"},
         {"shaders/skybox_ps.glsl", "fragment"}
     }};
@@ -228,13 +228,13 @@ int main() {
         // // set camera postion
         // pbr_shader.set_uniform("camPos", camPos);
         // // set uniform render wireframe
-        // pbr_shader.set_uniform_i("render_wireframe", (int)imgui_renderer::render_wireframe);
+        // pbr_shader.set_uniform_i("render_wireframe", (int)ImGUIRenderer::render_wireframe);
         // render model
         // model_nanosuit.translate(glm::vec3(0.0f, -7.0f, 1.0f));
         // model_nanosuit.scale(glm::vec3(0.8f));
         // model_nanosuit.draw(pbr_shader);
         gltf_shader.bind();
-        gltf_shader.set_uniform_i("render_wireframe", (int)imgui_renderer::render_wireframe);
+        gltf_shader.set_uniform_i("render_wireframe", (int)ImGUIRenderer::render_wireframe);
         g_m.draw(gltf_shader);
 
         // render Skybox (render as last to prevent overdraw)
@@ -243,7 +243,7 @@ int main() {
         env_skybox.draw();
 
         // render ImGui
-        imgui_renderer::get_instance().render_imgui();
+        ImGUIRenderer::get_instance().render_imgui();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -252,7 +252,7 @@ int main() {
     }
 
     // ImGui Cleanup
-    imgui_renderer::get_instance().destroy_imgui();
+    ImGUIRenderer::get_instance().destroy_imgui();
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------

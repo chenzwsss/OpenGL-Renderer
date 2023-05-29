@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "../utility/resource_manager.h"
+#include "../utility/ResourceManager.h"
 #include "../base/Vertex.h"
 
 glTFModel::glTFModel(const std::string file_path) {
@@ -12,7 +12,7 @@ glTFModel::glTFModel(const std::string file_path) {
 }
 
 void glTFModel::load_gltf_file(const std::string file_path) {
-    std::string new_path = resource_manager::get_instance().get_assets_path() + file_path;
+    std::string new_path = ResourceManager::get_instance().get_assets_path() + file_path;
 
     tinygltf::Model gltf_input;
     tinygltf::TinyGLTF gltf_content;
@@ -34,13 +34,13 @@ void glTFModel::load_gltf_file(const std::string file_path) {
     }
 }
 
-void glTFModel::draw(gl_shader_program& shader) {
+void glTFModel::draw(GLShaderProgram& shader) {
     for (auto& node : m_nodes) {
         drawNode(node, shader);
     }
 }
 
-void glTFModel::drawNode(glTFModel::Node* node, gl_shader_program& shader) {
+void glTFModel::drawNode(glTFModel::Node* node, GLShaderProgram& shader) {
     if (node->mesh.primitives.size() > 0) {
  
         // Set model matrix
@@ -93,7 +93,7 @@ void glTFModel::loadImages(tinygltf::Model& input) {
             bufferSize = glTFImage.image.size();
         }
         // Load texture from image buffer
-        images[i].texture = resource_manager::get_instance().texture_from_buffer(
+        images[i].texture = ResourceManager::get_instance().texture_from_buffer(
             buffer,
             glTFImage.name,
             glTFImage.width,

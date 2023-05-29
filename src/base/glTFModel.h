@@ -10,7 +10,7 @@
 
 #include "glTFMesh.h"
 
-#include "../graphic/gl_shader_program.h"
+#include "../graphic/GLShaderProgram.h"
 
 class glTFModel {
     public:
@@ -46,9 +46,9 @@ class glTFModel {
 
         glTFModel(const std::string file_path);
 
-        void draw(gl_shader_program& shader);
+        void draw(GLShaderProgram& shader);
 
-        void drawNode(glTFModel::Node* node, gl_shader_program& shader);
+        void drawNode(glTFModel::Node* node, GLShaderProgram& shader);
 
 
         void load_gltf_file(const std::string file_path);

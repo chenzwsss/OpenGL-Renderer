@@ -3,10 +3,10 @@
 
 #include <string>
 
-class resource_manager {
+class ResourceManager {
     public:
         static auto& get_instance() {
-            static resource_manager instance;
+            static ResourceManager instance;
             return instance;
         }
 

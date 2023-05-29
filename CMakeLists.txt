@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(PROJECT_NAME opengl_renderer)
+set(PROJECT_NAME OpenGL-Renderer)
 
 project (${PROJECT_NAME})
 
@@ -36,14 +36,15 @@ endif(WIN32)
 set(SOURCES
     src/main.cpp
     ${PROJECT_SOURCE_DIR}/external/glad/src/glad.c
-    src/graphic/gl_vertex_array.h
-    src/graphic/gl_vertex_array.cpp
-    src/graphic/gl_shader_program.h
-    src/graphic/gl_shader_program.cpp
-    src/utility/resource_manager.h
-    src/utility/resource_manager.cpp
-    src/utility/imgui_renderer.h
-    src/utility/imgui_renderer.cpp
+    src/graphic/GLVertexArray.h
+    src/graphic/GLVertexArray.cpp
+    src/graphic/GLShaderProgram.h
+    src/graphic/GLShaderProgram.cpp
+    src/graphic/ShaderCreateInfo.h
+    src/utility/ResourceManager.h
+    src/utility/ResourceManager.cpp
+    src/utility/ImGUIRenderer.h
+    src/utility/ImGUIRenderer.cpp
     src/base/RenderCamera.hpp
     src/base/Vertex.h
     src/base/Skybox.h
