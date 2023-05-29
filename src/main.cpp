@@ -52,11 +52,11 @@ const std::string WINDOW_NAME = "opengl_renderer";
 
 GLuint m_uboMatrices{ 0 };
 
-struct {
+struct MouseButtons {
     bool left = false;
     bool right = false;
     bool middle = false;
-} mouse_buttons;
+} mouseButtons;
 
 struct LightSource {
     glm::vec3 color = glm::vec3(1.0f);
@@ -97,7 +97,7 @@ int main() {
     }
 
     // initial ImGui
-    ImGUIRenderer::get_instance().setup_imgui(window);
+    ImGUIRenderer::getInstance().setupImGUI(window);
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
     // stbi_set_flip_vertically_on_load(true);
@@ -120,11 +120,11 @@ int main() {
 
     // camera
     camera.type = RenderCamera::camera_type::lookat;
-    camera.set_perspective(45.0f, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 256.0f);
+    camera.setPerspective(45.0f, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 256.0f);
     camera.rotation_speed = 0.1f;
     camera.movement_speed = 0.1f;
-    camera.set_position({ 0.0f, 0.0f, -3.0f });
-    camera.set_rotation({ 0.0f, 0.0f, 0.0f });
+    camera.setPosition({ 0.0f, 0.0f, -3.0f });
+    camera.setRotation({ 0.0f, 0.0f, 0.0f });
 
     // shader program
     GLShaderProgram gltf_shader("glTF Shader", {
@@ -133,7 +133,7 @@ int main() {
         {"shaders/glsl/mesh.frag", "fragment"}
     });
     gltf_shader.bind();
-    gltf_shader.set_uniform_i("albedoMap", 0);
+    gltf_shader.setUniformi("albedoMap", 0);
 
     GLShaderProgram skybox_shader{"Skybox Shader", {
         {"shaders/glsl/skybox.vert", "vertex"},
@@ -141,16 +141,16 @@ int main() {
     }};
 
     // pbr_shader.bind();
-    // pbr_shader.set_uniform_i("irradianceMap", 0);
-    // pbr_shader.set_uniform_i("prefilterMap", 1);
-    // pbr_shader.set_uniform_i("brdfLUT", 2);
-    // pbr_shader.set_uniform_i("albedoMap", 3);
-    // pbr_shader.set_uniform_i("normalMap", 4);
-    // pbr_shader.set_uniform_i("metallicMap", 5);
-    // pbr_shader.set_uniform_i("roughnessMap", 6);
+    // pbr_shader.setUniformi("irradianceMap", 0);
+    // pbr_shader.setUniformi("prefilterMap", 1);
+    // pbr_shader.setUniformi("brdfLUT", 2);
+    // pbr_shader.setUniformi("albedoMap", 3);
+    // pbr_shader.setUniformi("normalMap", 4);
+    // pbr_shader.setUniformi("metallicMap", 5);
+    // pbr_shader.setUniformi("roughnessMap", 6);
 
     skybox_shader.bind();
-    skybox_shader.set_uniform_i("environmentMap", 0);
+    skybox_shader.setUniformi("environmentMap", 0);
 
     // model
     // model model_nanosuit("data/nanosuit/nanosuit.obj", "nanosuit");
@@ -180,8 +180,8 @@ int main() {
     //     cos(glm::radians(lightSource.rotation.x)) * cos(glm::radians(lightSource.rotation.y)),
     //     0.0f);
     // pbr_shader.bind();
-    // pbr_shader.set_uniform("lightDir", lightDir);
-    // pbr_shader.set_uniform("lightColor", lightSource.color);
+    // pbr_shader.setUniform("lightDir", lightDir);
+    // pbr_shader.setUniform("lightColor", lightSource.color);
 
     // render loop
     // -----------
@@ -212,11 +212,11 @@ int main() {
 
         // bind pre-computed IBL data
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_irradiance_map());
+        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.getIrradianceMap());
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.get_prefilter_map());
+        glBindTexture(GL_TEXTURE_CUBE_MAP, env_skybox.getPrefilterMap());
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, env_skybox.get_brdf_lut());
+        glBindTexture(GL_TEXTURE_2D, env_skybox.getBRDFLUT());
 
        /* glm::vec3 camPos = glm::vec3(
             camera.position.z * sin(glm::radians(camera.rotation.y)) * cos(glm::radians(camera.rotation.x)),
@@ -226,24 +226,24 @@ int main() {
 
         // pbr_shader.bind();
         // // set camera postion
-        // pbr_shader.set_uniform("camPos", camPos);
+        // pbr_shader.setUniform("camPos", camPos);
         // // set uniform render wireframe
-        // pbr_shader.set_uniform_i("render_wireframe", (int)ImGUIRenderer::render_wireframe);
+        // pbr_shader.setUniformi("render_wireframe", (int)ImGUIRenderer::render_wireframe);
         // render model
         // model_nanosuit.translate(glm::vec3(0.0f, -7.0f, 1.0f));
         // model_nanosuit.scale(glm::vec3(0.8f));
         // model_nanosuit.draw(pbr_shader);
         gltf_shader.bind();
-        gltf_shader.set_uniform_i("render_wireframe", (int)ImGUIRenderer::render_wireframe);
+        gltf_shader.setUniformi("render_wireframe", (int)ImGUIRenderer::render_wireframe);
         g_m.draw(gltf_shader);
 
         // render Skybox (render as last to prevent overdraw)
         skybox_shader.bind();
-        // skybox_shader.set_uniform("view", view);
+        // skybox_shader.setUniform("view", view);
         env_skybox.draw();
 
         // render ImGui
-        ImGUIRenderer::get_instance().render_imgui();
+        ImGUIRenderer::getInstance().renderImGUI();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -252,7 +252,7 @@ int main() {
     }
 
     // ImGui Cleanup
-    ImGUIRenderer::get_instance().destroy_imgui();
+    ImGUIRenderer::getInstance().destroyImGUI();
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -271,7 +271,7 @@ void process_input(GLFWwindow *window) {
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     if ((width > 0.0f) && (height > 0.0f)) {
-        camera.update_aspect_ratio((float)width / (float)height);
+        camera.updateAspectRatio((float)width / (float)height);
     }
 
     // make sure the viewport matches the new window dimensions; note that width and 
@@ -283,19 +283,19 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
         if (action == GLFW_PRESS)
-            mouse_buttons.left = true;
+            mouseButtons.left = true;
         else if (action == GLFW_RELEASE)
-            mouse_buttons.left = false;
+            mouseButtons.left = false;
     } else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
         if (action == GLFW_PRESS)
-            mouse_buttons.right = true;
+            mouseButtons.right = true;
         else if (action == GLFW_RELEASE)
-            mouse_buttons.right = false;
+            mouseButtons.right = false;
     } else if (button == GLFW_MOUSE_BUTTON_MIDDLE) {
         if (action == GLFW_PRESS)
-            mouse_buttons.middle = true;
+            mouseButtons.middle = true;
         else if (action == GLFW_RELEASE)
-            mouse_buttons.middle = false;
+            mouseButtons.middle = false;
     }
 }
 
@@ -311,13 +311,13 @@ void cursor_position_callback(GLFWwindow* window, double x, double y) {
     last_x = xpos;
     last_y = ypos;
 
-    if (mouse_buttons.left) {
+    if (mouseButtons.left) {
         camera.rotate(glm::vec3(dy * camera.rotation_speed, dx * camera.rotation_speed, 0.0f));
     }
-    if (mouse_buttons.right) {
+    if (mouseButtons.right) {
         camera.translate(glm::vec3(-0.0f, 0.0f, dy * .005f));
     }
-    if (mouse_buttons.middle) {
+    if (mouseButtons.middle) {
         camera.translate(glm::vec3(dx * 0.005f, -dy * 0.005f, 0.0f));
     }
 }

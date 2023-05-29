@@ -9,18 +9,18 @@ void glTFMesh::setupMesh(const std::vector<Vertex>& vertices, const std::vector<
     m_VAO.init();
     m_VAO.bind();
     // Attach VBO
-    m_VAO.attach_buffer(GLVertexArray::buffer_type::ARRAY, vertices.size() * sizeof(Vertex), GLVertexArray::draw_mode::STATIC, &vertices[0]);
+    m_VAO.attachBuffer(GLVertexArray::buffer_type::ARRAY, vertices.size() * sizeof(Vertex), GLVertexArray::draw_mode::STATIC, &vertices[0]);
     // Attach EBO
-    m_VAO.attach_buffer(GLVertexArray::buffer_type::ELEMENT, indices.size() * sizeof(GLuint), GLVertexArray::draw_mode::STATIC, &indices[0]);
+    m_VAO.attachBuffer(GLVertexArray::buffer_type::ELEMENT, indices.size() * sizeof(GLuint), GLVertexArray::draw_mode::STATIC, &indices[0]);
 
     // Vertex Attributes
     const static auto vertex_size = sizeof(Vertex);
     // Position
-    m_VAO.enable_attribute(0, 3, vertex_size, nullptr);
+    m_VAO.enableAttribute(0, 3, vertex_size, nullptr);
     // Normal
-    m_VAO.enable_attribute(1, 3, vertex_size, reinterpret_cast<void*>(offsetof(Vertex, Normal)));
+    m_VAO.enableAttribute(1, 3, vertex_size, reinterpret_cast<void*>(offsetof(Vertex, Normal)));
     // Texture Coord 0
-    m_VAO.enable_attribute(2, 2, vertex_size, reinterpret_cast<void*>(offsetof(Vertex, TexCoords)));
+    m_VAO.enableAttribute(2, 2, vertex_size, reinterpret_cast<void*>(offsetof(Vertex, TexCoords)));
 }
 
 void glTFMesh::draw() {

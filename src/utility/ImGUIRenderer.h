@@ -7,14 +7,14 @@
 
 class ImGUIRenderer {
     public:
-        static auto& get_instance() {
+        static auto& getInstance() {
             static ImGUIRenderer instance;
             return instance;
         }
 
-        void setup_imgui(GLFWwindow* window);
-        void render_imgui();
-        void destroy_imgui();
+        void setupImGUI(GLFWwindow* window);
+        void renderImGUI();
+        void destroyImGUI();
 
         static bool render_wireframe;
 };

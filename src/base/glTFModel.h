@@ -44,14 +44,14 @@ class glTFModel {
             }
         };
 
-        glTFModel(const std::string file_path);
+        glTFModel(const std::string filePath);
 
         void draw(GLShaderProgram& shader);
 
         void drawNode(glTFModel::Node* node, GLShaderProgram& shader);
 
 
-        void load_gltf_file(const std::string file_path);
+        void loadglTFFile(const std::string filePath);
         void loadImages(tinygltf::Model& input);
         void loadTextures(tinygltf::Model& input);
         void loadMaterials(tinygltf::Model& input);

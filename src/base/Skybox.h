@@ -10,13 +10,13 @@ class Skybox {
         void init(const std::string hdr_path, const GLsizei resolution = 512);
         void draw();
 
-        auto get_irradiance_map() const { return m_irradiance_map; }
-        auto get_prefilter_map() const { return m_prefilter_map; }
-        auto get_brdf_lut() const { return m_brdf_lut; }
+        auto getIrradianceMap() const { return m_irradianceMap; }
+        auto getPrefilterMap() const { return m_prefilterMap; }
+        auto getBRDFLUT() const { return m_BRDFLUT; }
     private:
-        void render_cube();
-        unsigned int m_cube_vao, m_env_cubemap, m_env_map_fbo, m_irradiance_map, m_prefilter_map, m_brdf_lut;
-        GLVertexArray m_quad_vao;
+        void renderCube();
+        unsigned int m_cubeVAO, m_envCubemap, m_envMapFBO, m_irradianceMap, m_prefilterMap, m_BRDFLUT;
+        GLVertexArray m_quadVAO;
 };
 
 #endif

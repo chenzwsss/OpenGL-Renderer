@@ -7,12 +7,12 @@
 #include "../utility/ResourceManager.h"
 #include "../base/Vertex.h"
 
-glTFModel::glTFModel(const std::string file_path) {
-    load_gltf_file(file_path);
+glTFModel::glTFModel(const std::string filePath) {
+    loadglTFFile(filePath);
 }
 
-void glTFModel::load_gltf_file(const std::string file_path) {
-    std::string new_path = ResourceManager::get_instance().get_assets_path() + file_path;
+void glTFModel::loadglTFFile(const std::string filePath) {
+    std::string new_path = ResourceManager::getInstance().getAssetsPath() + filePath;
 
     tinygltf::Model gltf_input;
     tinygltf::TinyGLTF gltf_content;
@@ -30,7 +30,7 @@ void glTFModel::load_gltf_file(const std::string file_path) {
             loadNode(node, gltf_input, nullptr);
         }
     } else {
-        std::cerr << "Could not open the glTF file: " << file_path << "error: " << error << std::endl;
+        std::cerr << "Could not open the glTF file: " << filePath << "error: " << error << std::endl;
     }
 }
 
@@ -44,7 +44,7 @@ void glTFModel::drawNode(glTFModel::Node* node, GLShaderProgram& shader) {
     if (node->mesh.primitives.size() > 0) {
  
         // Set model matrix
-        shader.set_uniform("modelMatrix", node->matrix);
+        shader.setUniform("modelMatrix", node->matrix);
 
         for (auto& primitive : node->mesh.primitives) {
             if (primitive.m_indexCount > 0) {
@@ -93,7 +93,7 @@ void glTFModel::loadImages(tinygltf::Model& input) {
             bufferSize = glTFImage.image.size();
         }
         // Load texture from image buffer
-        images[i].texture = ResourceManager::get_instance().texture_from_buffer(
+        images[i].texture = ResourceManager::getInstance().textureFromBuffer(
             buffer,
             glTFImage.name,
             glTFImage.width,

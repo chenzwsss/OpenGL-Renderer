@@ -11,7 +11,7 @@ class RenderCamera {
         float fov;
         float z_near, z_far;
 
-        void update_view_matrix() {
+        void updateViewMatrix() {
             glm::mat4 rot_m = glm::mat4(1.0f);
             glm::mat4 trans_m;
 
@@ -69,15 +69,15 @@ class RenderCamera {
             return keys.left || keys.right || keys.up || keys.down;
         }
 
-        float get_near_clip() {
+        float getNearClip() {
             return z_near;
         }
 
-        float get_far_clip() {
+        float getFarClip() {
             return z_far;
         }
 
-        void set_perspective(float fov, float aspect, float z_near, float z_far) {
+        void setPerspective(float fov, float aspect, float z_near, float z_far) {
             this->fov = fov;
             this->z_near = z_near;
             this->z_far = z_far;
@@ -87,43 +87,43 @@ class RenderCamera {
             }
         };
 
-        void update_aspect_ratio(float aspect) {
+        void updateAspectRatio(float aspect) {
             matrices.perspective = glm::perspective(glm::radians(fov), aspect, z_near, z_far);
             if (flip_y) {
                 matrices.perspective[1][1] *= -1.0f;
             }
         }
 
-        void set_position(glm::vec3 position) {
+        void setPosition(glm::vec3 position) {
             this->position = position;
-            update_view_matrix();
+            updateViewMatrix();
         }
 
-        void set_rotation(glm::vec3 rotation) {
+        void setRotation(glm::vec3 rotation) {
             this->rotation = rotation;
-            update_view_matrix();
+            updateViewMatrix();
         }
 
         void rotate(glm::vec3 delta) {
             this->rotation += delta;
-            update_view_matrix();
+            updateViewMatrix();
         }
 
-        void set_translation(glm::vec3 translation) {
+        void setTranslation(glm::vec3 translation) {
             this->position = translation;
-            update_view_matrix();
+            updateViewMatrix();
         };
 
         void translate(glm::vec3 delta) {
             this->position += delta;
-            update_view_matrix();
+            updateViewMatrix();
         }
 
-        void set_rotation_speed(float rotation_speed) {
+        void setRotationSpeed(float rotation_speed) {
             this->rotation_speed = rotation_speed;
         }
 
-        void set_movement_speed(float movement_speed) {
+        void setMovementSpeed(float movement_speed) {
             this->movement_speed = movement_speed;
         }
 
@@ -149,7 +149,7 @@ class RenderCamera {
                         position += glm::normalize(glm::cross(cam_front, glm::vec3(0.0f, 1.0f, 0.0f))) * move_speed;
                 }
             }
-            update_view_matrix();
+            updateViewMatrix();
         };
 };
 

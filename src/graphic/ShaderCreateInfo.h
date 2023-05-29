@@ -6,9 +6,9 @@
 struct ShaderCreateInfo {
     ShaderCreateInfo() = default;
     ShaderCreateInfo(const std::string path, const std::string type)
-        : file_path(path), type(type) {}
+        : filePath(path), type(type) {}
 
-    std::string file_path;
+    std::string filePath;
     std::string type;
 };
 

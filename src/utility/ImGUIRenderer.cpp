@@ -2,7 +2,7 @@
 
 bool ImGUIRenderer::render_wireframe = false;
 
-void ImGUIRenderer::setup_imgui(GLFWwindow* window) {
+void ImGUIRenderer::setupImGUI(GLFWwindow* window) {
     // Setup Dear ImGui content
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -14,7 +14,7 @@ void ImGUIRenderer::setup_imgui(GLFWwindow* window) {
 }
 
 
-void ImGUIRenderer::render_imgui() {
+void ImGUIRenderer::renderImGUI() {
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -37,7 +37,7 @@ void ImGUIRenderer::render_imgui() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGUIRenderer::destroy_imgui() {
+void ImGUIRenderer::destroyImGUI() {
     // ImGui Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

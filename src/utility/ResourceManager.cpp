@@ -8,11 +8,11 @@
 
 #include <stb_image.h>
 
-unsigned int ResourceManager::load_texture(std::string path, const bool useMipMaps) const {
+unsigned int ResourceManager::loadTexture(std::string path, const bool useMipMaps) const {
     if (path.empty())
         return 0;
 
-    std::string new_path = get_assets_path() + path;
+    std::string new_path = getAssetsPath() + path;
 
     unsigned int textureID;
     glGenTextures(1, &textureID);
@@ -56,11 +56,11 @@ unsigned int ResourceManager::load_texture(std::string path, const bool useMipMa
     return textureID;
 }
 
-unsigned int ResourceManager::load_hdr_i(const std::string path) const {
+unsigned int ResourceManager::loadHDRI(const std::string path) const {
 
     stbi_set_flip_vertically_on_load(true);
 
-    std::string new_path = get_assets_path() + path;
+    std::string new_path = getAssetsPath() + path;
 
     int width, height, nrComp;
     auto* data{ stbi_loadf(new_path.data(), &width, &height, &nrComp, 0) };
@@ -87,9 +87,9 @@ unsigned int ResourceManager::load_hdr_i(const std::string path) const {
     return hdrTexture;
 }
 
-std::string ResourceManager::load_text_file(const std::string path) const {
+std::string ResourceManager::loadTextFile(const std::string path) const {
 
-    std::string new_path = get_assets_path() + path;
+    std::string new_path = getAssetsPath() + path;
 
     std::ifstream in(new_path, std::ios::in);
     in.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -102,7 +102,7 @@ std::string ResourceManager::load_text_file(const std::string path) const {
     return std::string(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
 }
 
-unsigned int ResourceManager::texture_from_buffer(void* buffer, std::string name, int width, int height, int nrComponents, const bool useMipMaps) {
+unsigned int ResourceManager::textureFromBuffer(void* buffer, std::string name, int width, int height, int nrComponents, const bool useMipMaps) {
     if (!buffer) {
         std::cerr << "Resource Manager: Create texture error: " + name << " " << errno << std::endl;
         return 0;
