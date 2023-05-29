@@ -1,8 +1,8 @@
-#include "ImGUIRenderer.h"
+#include "ImGuiRenderer.h"
 
-bool ImGUIRenderer::render_wireframe = false;
+bool ImGuiRenderer::render_wireframe = false;
 
-void ImGUIRenderer::setupImGUI(GLFWwindow* window) {
+void ImGuiRenderer::setupImGui(GLFWwindow* window) {
     // Setup Dear ImGui content
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -14,7 +14,7 @@ void ImGUIRenderer::setupImGUI(GLFWwindow* window) {
 }
 
 
-void ImGUIRenderer::renderImGUI() {
+void ImGuiRenderer::renderImGui() {
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -37,7 +37,7 @@ void ImGUIRenderer::renderImGUI() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void ImGUIRenderer::destroyImGUI() {
+void ImGuiRenderer::destroyImGui() {
     // ImGui Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

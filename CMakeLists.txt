@@ -43,8 +43,8 @@ set(SOURCES
     src/graphic/ShaderCreateInfo.h
     src/utility/ResourceManager.h
     src/utility/ResourceManager.cpp
-    src/utility/ImGUIRenderer.h
-    src/utility/ImGUIRenderer.cpp
+    src/utility/ImGuiRenderer.h
+    src/utility/ImGuiRenderer.cpp
     src/base/RenderCamera.hpp
     src/base/Vertex.h
     src/base/Skybox.h

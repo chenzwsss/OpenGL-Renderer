@@ -5,16 +5,16 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-class ImGUIRenderer {
+class ImGuiRenderer {
     public:
         static auto& getInstance() {
-            static ImGUIRenderer instance;
+            static ImGuiRenderer instance;
             return instance;
         }
 
-        void setupImGUI(GLFWwindow* window);
-        void renderImGUI();
-        void destroyImGUI();
+        void setupImGui(GLFWwindow* window);
+        void renderImGui();
+        void destroyImGui();
 
         static bool render_wireframe;
 };

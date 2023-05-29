@@ -20,7 +20,7 @@
 
 #include "base/Skybox.h"
 
-#include "utility/ImGUIRenderer.h"
+#include "utility/ImGuiRenderer.h"
 
 #include "base/glTFModel.h"
 
@@ -97,7 +97,7 @@ int main() {
     }
 
     // initial ImGui
-    ImGUIRenderer::getInstance().setupImGUI(window);
+    ImGuiRenderer::getInstance().setupImGui(window);
 
     // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
     // stbi_set_flip_vertically_on_load(true);
@@ -228,13 +228,13 @@ int main() {
         // // set camera postion
         // pbr_shader.setUniform("camPos", camPos);
         // // set uniform render wireframe
-        // pbr_shader.setUniformi("render_wireframe", (int)ImGUIRenderer::render_wireframe);
+        // pbr_shader.setUniformi("render_wireframe", (int)ImGuiRenderer::render_wireframe);
         // render model
         // model_nanosuit.translate(glm::vec3(0.0f, -7.0f, 1.0f));
         // model_nanosuit.scale(glm::vec3(0.8f));
         // model_nanosuit.draw(pbr_shader);
         gltf_shader.bind();
-        gltf_shader.setUniformi("render_wireframe", (int)ImGUIRenderer::render_wireframe);
+        gltf_shader.setUniformi("render_wireframe", (int)ImGuiRenderer::render_wireframe);
         g_m.draw(gltf_shader);
 
         // render Skybox (render as last to prevent overdraw)
@@ -243,7 +243,7 @@ int main() {
         env_skybox.draw();
 
         // render ImGui
-        ImGUIRenderer::getInstance().renderImGUI();
+        ImGuiRenderer::getInstance().renderImGui();
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -252,7 +252,7 @@ int main() {
     }
 
     // ImGui Cleanup
-    ImGUIRenderer::getInstance().destroyImGUI();
+    ImGuiRenderer::getInstance().destroyImGui();
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
