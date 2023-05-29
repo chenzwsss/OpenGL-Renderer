@@ -1,4 +1,4 @@
-#include "skybox.h"
+#include "Skybox.h"
 
 #include <array>
 
@@ -52,7 +52,7 @@ const std::array<float, 108> vertices{
     -1.0f,  1.0f,  1.0f
 };
 
-void skybox::init(const std::string hdr_path, const GLsizei resolution) {
+void Skybox::init(const std::string hdr_path, const GLsizei resolution) {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS); // No seams at cubemap edges
 
     glGenVertexArrays(1, &m_cube_vao);
@@ -256,13 +256,13 @@ void skybox::init(const std::string hdr_path, const GLsizei resolution) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void skybox::draw() {
+void Skybox::draw() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_env_cubemap);
     render_cube();
 }
 
-void skybox::render_cube() {
+void Skybox::render_cube() {
     glBindVertexArray(m_cube_vao);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);

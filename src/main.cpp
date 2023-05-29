@@ -14,15 +14,15 @@
 #include <string>
 #include <iostream>
 
-#include "base/render_camera.hpp"
+#include "base/RenderCamera.hpp"
 #include "utility/resource_manager.h"
 #include "graphic/gl_shader_program.h"
 
-#include "base/skybox.h"
+#include "base/Skybox.h"
 
 #include "utility/imgui_renderer.h"
 
-#include "base/gltf_model.h"
+#include "base/glTFModel.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -40,7 +40,7 @@ const unsigned int SCR_WIDTH = 1280;
 const unsigned int SCR_HEIGHT = 720;
 
 // camera
-render_camera camera;
+RenderCamera camera;
 float last_x = SCR_WIDTH / 2.0f;
 float last_y = SCR_HEIGHT / 2.0f;
 
@@ -62,11 +62,6 @@ struct LightSource {
     glm::vec3 color = glm::vec3(1.0f);
     glm::vec3 rotation = glm::vec3(75.0f, 40.0f, 0.0f);
 } lightSource;
-
-struct HardwareCaps {
-    float MaxAnisotropy;
-    int TotalVideoMemoryKB;
-} hardwareCaps;
 
 int main() {
     // glfw: initialize and configure
@@ -110,7 +105,7 @@ int main() {
     // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
-    // set depth function to less than AND equal for skybox depth trick.
+    // set depth function to less than AND equal for Skybox depth trick.
     glDepthFunc(GL_LEQUAL);
     // enable seamless cubemap sampling for lower mip levels in the pre-filter map.
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -124,7 +119,7 @@ int main() {
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     // camera
-    camera.type = render_camera::camera_type::lookat;
+    camera.type = RenderCamera::camera_type::lookat;
     camera.set_perspective(45.0f, (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 256.0f);
     camera.rotation_speed = 0.1f;
     camera.movement_speed = 0.1f;
@@ -160,10 +155,10 @@ int main() {
     // model
     // model model_nanosuit("data/nanosuit/nanosuit.obj", "nanosuit");
 
-    gltf_model g_m("models/DamagedHelmet/glTF-Embedded/DamagedHelmet.gltf");
+    glTFModel g_m("models/DamagedHelmet/glTF-Embedded/DamagedHelmet.gltf");
 
-    // skybox
-    skybox env_skybox;
+    // Skybox
+    Skybox env_skybox;
     env_skybox.init("textures/hdr/hdriHaven4k.hdr", 512);
 
     // initialize static shader uniforms before rendering
@@ -242,7 +237,7 @@ int main() {
         gltf_shader.set_uniform_i("render_wireframe", (int)imgui_renderer::render_wireframe);
         g_m.draw(gltf_shader);
 
-        // render skybox (render as last to prevent overdraw)
+        // render Skybox (render as last to prevent overdraw)
         skybox_shader.bind();
         // skybox_shader.set_uniform("view", view);
         env_skybox.draw();

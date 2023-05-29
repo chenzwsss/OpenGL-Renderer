@@ -5,7 +5,7 @@
 
 #include "../graphic/gl_vertex_array.h"
 
-class skybox {
+class Skybox {
     public:
         void init(const std::string hdr_path, const GLsizei resolution = 512);
         void draw();

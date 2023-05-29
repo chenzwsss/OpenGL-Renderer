@@ -44,11 +44,12 @@ set(SOURCES
     src/utility/resource_manager.cpp
     src/utility/imgui_renderer.h
     src/utility/imgui_renderer.cpp
+    src/base/RenderCamera.hpp
     src/base/Vertex.h
-    src/base/skybox.h
-    src/base/skybox.cpp
-    src/base/gltf_model.h
-    src/base/gltf_model.cpp
+    src/base/Skybox.h
+    src/base/Skybox.cpp
+    src/base/glTFModel.h
+    src/base/glTFModel.cpp
     src/base/gltfMesh.h
     src/base/gltfMesh.cpp
 )

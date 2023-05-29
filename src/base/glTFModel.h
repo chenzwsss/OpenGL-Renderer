@@ -12,7 +12,7 @@
 
 #include "../graphic/gl_shader_program.h"
 
-class gltf_model {
+class glTFModel {
     public:
         // Contains the node's (optional) geometry and can be made up of an arbitrary number of primitives
         struct Mesh {
@@ -44,18 +44,18 @@ class gltf_model {
             }
         };
 
-        gltf_model(const std::string file_path);
+        glTFModel(const std::string file_path);
 
         void draw(gl_shader_program& shader);
 
-        void drawNode(gltf_model::Node* node, gl_shader_program& shader);
+        void drawNode(glTFModel::Node* node, gl_shader_program& shader);
 
 
         void load_gltf_file(const std::string file_path);
         void loadImages(tinygltf::Model& input);
         void loadTextures(tinygltf::Model& input);
         void loadMaterials(tinygltf::Model& input);
-        void loadNode(const tinygltf::Node& input_node, const tinygltf::Model& input, gltf_model::Node* parent);
+        void loadNode(const tinygltf::Node& input_node, const tinygltf::Model& input, glTFModel::Node* parent);
 
         /*
             Model data
